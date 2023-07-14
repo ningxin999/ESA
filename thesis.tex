@@ -1,0 +1,58 @@
+\documentclass[a4paper,12pt,twoside]{report}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=3cm]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{apacite}
+\usepackage{enumitem}
+\usepackage{tocbibind}
+\usepackage{tikz}
+\usepackage{graphicx}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\usepackage{cleveref}
+
+
+\include{thesis.preamble}
+
+\begin{document}
+
+\title{\LARGE {\bf Data-driven approach to modelling bearing behaviors of
+ OWT foundations}\\
+ \vspace*{6mm}
+}
+
+\author{Ningxin Yang}
+\submitdate{October 2008}
+
+\normallinespacing
+\maketitle
+
+\preface
+\input{abstract/abstract}
+\input{acknowledgements/acknowledgements}
+\input{dedication/dedication}
+\input{quotes/quotes}
+
+\body
+\input{introduction/introduction}
+\input{State/state}
+\input{Focus/Focus}
+\input{Work_Plan/Work_Plan}
+% body of thesis comes here
+
+\input{conclusion/conclusion}
+
+\appendix
+% appendices come here
+
+
+\addcontentsline{toc}{chapter}{Bibliography}
+\bibliographystyle{apacite}
+\bibliography{bibliography/bibliography}
+
+
+\end{document}
