@@ -2,87 +2,48 @@
 
 \label{ch:State}
 
-\section{Markov Chain}
-
-As shown in \cref{fig:fig2.1}, Markov Chain is involved in Bayesian inference calculation and can therefore reduce the analysis time and provide reasonable posterior results.
+\section{Scale of fluctuation}
 
 
-  \begin{figure}[htbp]
-      \centering
-       \begin{tikzpicture}[
-              node distance=3cm,
-              state/.style={circle, draw, fill=white, inner sep=0pt, minimum size=5mm},
-              arrow/.style={->, >=latex, shorten >=1pt, thick}
-            ]
-              % Define state nodes
-              \node[state] (X0) {$X_0$};
-              \node[state, right of=X0] (X1) {$X_1$};
-              \node[state, right of=X1] (X2) {$X_2$};
-              \node[state, right of=X2] (Xdots) {$\dots$};
-              \node[state, right of=Xdots] (Xn) {$X_n$};
-            
-              % Draw arrows
-              \draw[arrow] (X0) -- node[above] {$P(X_1|X_0)$} (X1);
-              \draw[arrow] (X1) -- node[above] {$P(X_2|X_1)$} (X2);
-              \draw[arrow] (X2) -- node[above] {} (Xdots);
-              \draw[arrow] (Xdots) -- node[above] {} (Xn);
-            
-              % Add time labels
-              \node[below of=X0, node distance=0.8cm] (T0) {Time $t_0$};
-              \node[below of=X1, node distance=0.8cm] (T1) {Time $t_1$};
-              \node[below of=X2, node distance=0.8cm] (T2) {Time $t_2$};
-              \node[below of=Xdots, node distance=0.8cm] (Tdots) {$\dots$};
-              \node[below of=Xn, node distance=0.8cm] (Tn) {Time $t_n$};
-            \end{tikzpicture}
-              
-      \caption{Markov Chain process}
-      \label{fig:fig2.1}
-  \end{figure}
+Due to the complex geological and environmental processes involved, the soil characteristics in situ are rarely homogeneous. The soil characteristics can be highly variable and spatially correlated in the vertical and horizontal directions. As shown in \cref{fig:fig5}, a soil property $g\left ( z \right )$ can be decomposed into a deterministic trend component $t\left ( z \right )$ and a stationary random function $w\left ( z \right )$ as follows: 
+\begin{equation}
+g\left ( z \right ) = t\left ( z \right ) +  w\left ( z \right ) 
+\end{equation}
 
-  Markov Chain has two main features:
-  \begin{itemize}
-      \item State transition of Markov chains depends only on the current state, thus simplifying the modeling process
-      \item Given the current state, a state transition probability distribution can be used to infer the likelihood of the next state
-
-  \end{itemize}
-
-  Thus, the properties of Markov Chain will bring two advantages: 
-
-  \begin{itemize}
-      \item Adapt to more complex models (with increasing soil parameters)
-      \item Iterative updating of parameter estimates because of Markov Chain’s property (enables  updating the priors through Bayesian inference in stage)
-
-  \end{itemize}
+This concept of the Scale of fluctuation (SoF) was firstly proposed by \cite{vanmarcke1977}, which provides an indicator of the estimated distance over a soil property. It is a convenient measure for describing the spatial variability of a soil property in a random field. A small SoF indicates that the soil oscillates quickly around its mean trend, whereas a large SoF indicates that the property is nearly spatially homogeneous.
 
 
-  \section{Partially observed Markov decision process (POMDP)}
-
-As shown in \cref{fig:fig2.2}, based on Markov Chain, with introducing Rewards and Actions, it can form the basis of Partially observed Markov decision process.
 
 
-\begin{figure}[htbp]
+
+
+
+
+For the values of the SoF, scales of fluctuation reported in the literature generally indicate that the horizontal SoF is larger than the vertical SoF. And the range for the vertical SoF is relatively narrow, from 0.06 to 2.6 m, for cone penetration test (CPT) results. However, the range for the horizontal SoF for CPT is fairly broad, from 0.14 to 80 m.
+
+
+
+
+\begin{figure}[!ht]
     \centering
-    \includegraphics[width = 190mm]{Figures/figure3.pdf}
-    \caption{Untrained strength profile at Cowden \protect\cite{kapteyn2021}}
-    \label{fig:fig2.2}
+    
+    \includegraphics[width = 90mm]{Figures/figure5.jpg}
+    \caption{Illustration of the soil inherent variability (follow \cite{nie2015})}
+    \label{fig:fig5}
+\captionsetup{belowskip=0pt}
 \end{figure}
 
 
-\section{Digital Twin}
 
-Generally, Digital Twin can be divided into two main parts, including (1) calibration and assimilation (2) Prediction, as shown in \cref{equation 2.1}  and \cref{equation 2.2}.
+For assessment, in the present study, the autocorrelation fitting method (ACFM) appears to be one of the most widely used methods for estimating SoF. The main idea of ACFM is to fit theoretical models to the sample autocorrelation function $\hat{\rho}\left ( \tau  \right ) $based on an ordinary least squares approach.
+
+
+
+Let $\bar{w}$ and $\hat{\sigma}^{2}$ denote the sample mean and the sample variance of $w\left ( z \right )$. where $n\left ( \tau  \right )$denotes the number of pairs that are separated by the distance $\tau$.The sample autocorrelation function can be obtained from the following equation:
 
 \begin{equation}
-\begin{aligned}
-& p(D_{0},...,D_{t_{c}},Q_{0},...,Q_{t_{c}},R_{0},...,R_{t_{c}}|o_{0},...,o_{t_{c}},u_{0},...,u_{t_{c}}) \\
-& = \prod_{t=0}^{t_{c}}[\phi_{t}^{update}\phi_{t}^{QoI}\phi_{t}^{evaluation}] \label{equation 2.1}
-\end{aligned}
+ \hat{\rho}\left ( \tau  \right ) = \frac{\sum\limits_{i=1}^{n\left ( \tau  \right )}\left [ w\left ( z_{i}  \right )-  \bar{w}  \right ]\left [  w\left ( z_{i} +   \tau \right ) -\bar{w} \right ]   }{\left [ n\left ( \tau  \right )-1 \right ] \hat{\sigma}^{2}  } 
 \end{equation}
 
 
-\begin{equation}
-\begin{aligned}
-    & p(D_{0},...,D_{t_{p}},Q_{0},...,Q_{t_{p}},R_{0},...,R_{t_{p}},U_{t_{c}+1},...,U_{t_{p}}|o_{0},...,o_{t_{c}},u_{0},...,u_{t_{c}}) \\
-    & \propto \prod_{t=0}^{t_{p}}[\phi_{t}^{dynamics}\phi_{t}^{QoI}\phi_{t}^{evaluation}] \prod_{t=0}^{t_{c}}\phi_{t}^{assimilation} \prod_{t=t_{c}+1}^{t_{p}}\phi_{t}^{control} \label{equation 2.2}
-\end{aligned}
-\end{equation}
+

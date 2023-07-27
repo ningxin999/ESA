@@ -1,5 +1,5 @@
-\documentclass[a4paper,12pt,twoside]{report}
-\usepackage[left=2cm,right=2cm,top=2cm,bottom=3cm]{geometry}
+\documentclass[a4paper,12pt,twoside,scale = 0.8]{report}
+\usepackage[left=3cm,right=2.5cm,top=2.8cm,bottom=2.5cm]{geometry}
 \usepackage[table]{xcolor}
 \usepackage{amssymb}
 \usepackage{hyperref}
@@ -8,15 +8,32 @@
 \usepackage{tocbibind}
 \usepackage{tikz}
 \usepackage{graphicx}
-
+\usepackage{indentfirst} 
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{epstopdf}
 \usepackage{cleveref}
+\usepackage{float}
+\usepackage{parskip}
+\usepackage{setspace}
+\usepackage{natbib}
+\usepackage{booktabs}
+\usepackage{makecell}
+\usepackage{caption}
+\usepackage{titlesec}
 
-
+\crefname{figure}{Figure}{Figures}
+\crefname{equation}{Equation}{Equations}
 \include{thesis.preamble}
+\titlespacing{\chapter}{0pt}{\dimexpr\parskip-1ex}{\dimexpr\parskip-0.5ex}
+\titlespacing{\section}{0pt}{\dimexpr\parskip-0.5ex}{\dimexpr\parskip-0.25ex}
+\titlespacing{\subsection}{0pt}{\dimexpr\parskip-0.25ex}{\dimexpr\parskip-0.5ex}
+
+
+
+
+
 
 \begin{document}
 
@@ -31,7 +48,7 @@
 \normallinespacing
 \maketitle
 
-\preface
+%\preface
 \input{abstract/abstract}
 %\input{acknowledgements/acknowledgements}
 %\input{dedication/dedication}
@@ -40,6 +57,8 @@
 \body
 \input{introduction/introduction}
 \input{State/state}
+\input{Active learning for bayesian inference/Active learning for bayesian inference}
+\input{MathematicalFundation/MathematicalFundation}
 \input{Focus/Focus}
 \input{Work_Plan/Work_Plan}
 % body of thesis comes here
