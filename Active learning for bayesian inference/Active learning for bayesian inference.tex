@@ -1,45 +1,13 @@
-\chapter{Active learning for Bayesian inference}
-
-\section{Reduced-order surrogate model}
-
-Computer modelling is used in nearly every field of science and engineering. Often, these computer codes model complex phenomena, have many input parameters,
-and are expensive to evaluate. In order to explore the behavior of the model under uncertainty (e.g., uncertainty propagation, parameter calibration from data or sensitivity analysis), many
-model runs are required. However, if the model is costly, only a few model evaluations can be afforded, which often do not suffice for thorough uncertainty quantification. In engineering and applied sciences, a popular work-around in this situation is to construct a reduced-order surrogate model. A reduced-order surrogate model is a cheap-to-evaluate proxy of the original model, which typically can be constructed from a relatively small number of model evaluations and approximates
-the input-output relation of the original model well. Since the surrogate model is cheap to evaluate, uncertainty quantification can be performed at a low cost by using the surrogate
-model instead of the original model. Therefore, surrogate modelling aims at constructing a metamodel that provides an accurate approximation to the original model while requiring as few model evaluations as possible for its construction.
-
-\section{Bayesian inference framework}
-
-\subsection{Bayes theorem for soil parameter estimate}
-
-Bayesian theorem provides a possible tool to understand and update the uncertainties for the priors as shown in \cref{equation 1.1}.
-\begin{equation}
-P(A|B) = \frac{{P(B|A) \cdot P(A)}}{{P(B)}} \label{equation 1.1}
-\end{equation}
-$P(A|B)$: posterior: Distribution of soil parameters;$P(B|A)$:likelihood: observed data and FE simulation based on priors; $P(A)$: prior: Soil parameters from lab/field.
-
-\subsection{Maximise a posterior estimation (MAP)}
-
-
-\subsection{Sampling methods}
-
-\subsection{Maximal likelihood estimation (MLE)}
-
-
+\chapter{Active learning for sequential Bayesian inference}
 
 
 \section{Sequential enrichment for surrogate model}
 
+Traditional large-scale physics-based models are intractable to solve real-time, many-query context problem. 
+
+
 Instead of sampling the whole experimental design at once, it has been proposed to use sequential enrichment. Starting with
 a small experimental design, additional points are chosen based on the last computed sparse
-solution. In the context of machine learning, sequential sampling is also known as active learning.  In all
-cases, numerical examples show that the sequential strategy generally leads to solutions with
+solution. In the context of machine learning, sequential sampling is also known as active learning.  In all cases, numerical examples show that the sequential strategy generally leads to solutions with
 a smaller validation error compared to non-sequential strategies
-
-
-
-\section{Sequential Bayesian inference}
-
-
-
 
