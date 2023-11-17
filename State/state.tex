@@ -1,49 +1,114 @@
-\chapter{State of the Art}
+\chapter{State of the Art Review on UQ techniques}
 
 \label{ch:State}
 
-\section{Scale of fluctuation}
+\section{Surrogate model-Spectral method}
 
-
-Due to the complex geological and environmental processes involved, the soil characteristics in situ are rarely homogeneous. The soil characteristics can be highly variable and spatially correlated in the vertical and horizontal directions. As shown in \cref{fig:fig5}, a soil property $g\left ( z \right )$ can be decomposed into a deterministic trend component $t\left ( z \right )$ and a stationary random function $w\left ( z \right )$ as follows: 
+Computer modelling is used in nearly every field of science and engineering. Often, these computer codes model complex phenomena, have many input parameters,
+and are expensive to evaluate. In order to explore the behavior of the model under uncertainty (e.g., uncertainty propagation, parameter calibration from data or sensitivity analysis), many
+model runs are required. However, if the model is costly, only a few model evaluations can be afforded, which often do not suffice for thorough uncertainty quantification. In engineering and applied sciences, a popular work-around in this situation is to construct a reduced-order surrogate model. A reduced-order surrogate model is a cheap-to-evaluate proxy of the original model, which typically can be constructed from a relatively small number of model evaluations and approximates
+the input-output relation of the original model well. Since the surrogate model is cheap to evaluate, uncertainty quantification can be performed at a low cost by using the surrogate
+model instead of the original model. Therefore, surrogate modelling aims at constructing a metamodel that provides an accurate approximation to the original model while requiring as few model evaluations as possible for its construction. A surrogate model $\tilde{\mathcal{M}}$ can be expressed as:
 \begin{equation}
-g\left ( z \right ) = t\left ( z \right ) +  w\left ( z \right ) 
+    \tilde{\mathcal{M}}(\boldsymbol{X})  \overset{\mathrm{def}}{=} \mathcal{M}(\boldsymbol{X}) - \mathcal{R}(\boldsymbol{X})
 \end{equation}
+where $\mathcal{R}$ is the residual between the original model and the surrogate.
 
-This concept of the Scale of fluctuation (SoF) was firstly proposed by \cite{vanmarcke1977}, which provides an indicator of the estimated distance over a soil property. It is a convenient measure for describing the spatial variability of a soil property in a random field. A small SoF indicates that the soil oscillates quickly around its mean trend, whereas a large SoF indicates that the property is nearly spatially homogeneous.
+Why not neural networks?
+
+Model reduction lets us create approximate models that are fast to solve, and — importantly — it provides us a rigorous mathematical basis on which to establish strong guarantees of accuracy of the low-dimensional model. This is in contrast with black-box machine learning methods (ANN), where we just have to hope that our training data was rich enough to yield a sufficiently accurate surrogate model. This is especially problematic for engineering applications where we often need to issue extrapolatory predictions.
+
+\subsection{Polynomial chaos expansion}
+Metamodelling (or surrogate modelling) attempts to offset the increased costs of stochastic modelling by substituting the expensive-to-evaluate computational models (e.g. finite element models, FEM) with inexpensive-to-evaluate surrogates.
+Polynomial chaos expansions (PCE) are a powerful metamodelling technique that aims at providing a functional approxmation of a computational model through its spectral representation on a suitably built basis of polynomial functions.
+
+Different from other surrogate modelling approaches such as support vector machine, Gaussian process regression, or neural networks, the mathematical theory underlying reduced-order models can lead to more reliable and robust predictive capability \citep{frangos2010,kapteyn2021}.
+
+Different from Monte Carlo simulation (MCS) which is based on point-to-point exploring the output space, PCE assumes a generic structure, which better exploits the available runs of the FE realizations.
 
 
 
+\section{Dimensionality reduction}
+
+
+Geotechnical problems inherently involve high dimensionality, posing challenges for learning methods like surrogate modeling. Technical constraints impact the storage and processing of such huge amount of data. Furthermore, as input and output data expand, independent scalar surrogate models show inadequate in accurately capturing the covariance matrix of the original data, leading to less reliable predictions. Consequently, in high dimensional space, the need for dimensionality reduction technique (DR) becomes more critical. 
+
+
+\subsection{Linear DR technique}
+
+\subsection{Nonlinear DR technique}
+
+\section{DR-based surrogate modelling}
+
+\section{Inverse problems in UQ}
+
+When faced with large-scale forward models characteristic of many engineering and science applications, high computational cost arises from: (1) In the large-scale setting, performing thousands or millions of forward simulations is often computationally intractable; (2)  the dimension of the input space are complex; (3) sampling may be complicated by the large dimensionality of the input space. Thus, to reduce the computational cost of solving of a statistical inverse problem, methods can be broadly in three groups: (1) Surrogate models to accelerate a forward simulation; (2) Reduce the dimension of the input space,i.e., sensitive analysis; (3) Efficient sampling method to posterior,i.e., MCMC.
 
 
 
+\subsection{Inverse problems}
 
+Bayesian theorem provides a possible tool to understand and update the uncertainties for the priors as shown in \cref{equation 1.1}.
+\setlength\abovedisplayskip{2pt}
+\setlength\belowdisplayskip{2pt}
+\begin{equation}
+P(A|B) = \frac{{P(B|A) \cdot P(A)}}{{P(B)}} \label{equation 1.1}
+\end{equation}
+$P(A|B)$: posterior: Distribution of soil parameters;$P(B|A)$:likelihood: observed data and FE simulation based on priors; $P(A)$: prior: Soil parameters from lab/field.
 
-For the values of the SoF, scales of fluctuation reported in the literature generally indicate that the horizontal SoF is larger than the vertical SoF. And the range for the vertical SoF is relatively narrow, from 0.06 to 2.6 m, for cone penetration test (CPT) results. However, the range for the horizontal SoF for CPT is fairly broad, from 0.14 to 80 m.
+\subsection{Bayesian inference}
 
+\subsection{Bayesian calibration}
 
+\subsection{Sampling methods}
 
+\subsubsection{Using the CDF}
 
-\begin{figure}[!ht]
+\begin{figure}[H]
     \centering
-    
-    \includegraphics[width = 90mm]{Figures/figure5.jpg}
-    \caption{Illustration of the soil inherent variability (follow \cite{nie2015})}
-    \label{fig:fig5}
-\captionsetup{belowskip=0pt}
+    \includegraphics[width = 90mm]{Figures/figure-CDF.pdf}
+    \caption{Sampling using an inverse CDF}
+    \label{fig:fig_CDF_sample}
+\end{figure}
+
+The simplest method for sampling from a univariate distribution is based on the inverse probability transform. As shown in \cref{fig:fig_CDF_sample}, if we can get the cumulative probability density function, then we can easily generate samples by computing $x$ = CDF($\mathcal{U}$). $\mathcal{U}$ follows uniform distribution $\mathcal{U} \sim U(0,1)$.
+
+
+
+
+\subsubsection{Rejection sampling}
+When the inverse cdf method cannot be used, one simple alternative is to use rejection sampling. In rejection sampling, we create a proposal distribution $q(x)$ which satisfies $Mq(x) \geq \tilde{p}(x)$, for some constant $M$, where $\tilde{p}(x)$ is an unnormalized version of $p(x)$ (i.e., $p(x)$ = $\tilde{p}(x)/Z$ for some unknown constant $Z$). The function $Mq(x)$ provides an upper envelope for $\tilde{p}$. We then sample $x \sim q(x)$, which corresponds to picking a random $x$ location, and then we sample $u \sim U(0,1)$ which corresponds to picking a random height ($y$ location) under the
+envelope. If $u \geq \frac{\tilde{p}(x)}{Mq(x)}$, we reject the sample,otherwise we accept it. See \cref{fig:fig-rejectsampling}, where acceptance region is shown shaded, and the rejection region is the white region between the shaded zone and the upper envelope.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 140mm]{Figures/figure-rejectionsampling.pdf}
+    \caption{Schematic illustration of rejection sampling from \protect\cite{andrieu2003}}
+    \label{fig:fig-rejectsampling}
+\end{figure}
+But, large-dimensional spaces tend to be very empty, and the chances that this method accepts a point may be dramatically low when working with multidimensional spaces.
+
+\subsubsection{Importance sampling}
+
+Often, in practical Bayesian models, it is not possible to obtain samples directly from p.x j y1WT / due to its complicated functional form.
+
+\subsubsection{Sequential Monte Carlo}
+
+
+\subsubsection{Markov chain Monte Carlo}
+Some Monte Carlo methods, including rejection sampling, importance sampling and particle filtering. The trouble with these methods is that they do not work well in high
+dimensional spaces. The most popular method for sampling from high-dimensional distributions
+is Markov chain Monte Carlo or MCMC. In a survey by \textit{SIAM News}
+, MCMC was placed in the
+top 10 most important algorithms of the 20th century \citep{murphy2012}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 150mm]{Figures/figure-markov_process.pdf}
+    \caption{Markov Chain process}
+    \label{fig:figure-markovchain}
 \end{figure}
 
 
-
-For assessment, in the present study, the autocorrelation fitting method (ACFM) appears to be one of the most widely used methods for estimating SoF. The main idea of ACFM is to fit theoretical models to the sample autocorrelation function $\hat{\rho}\left ( \tau  \right ) $based on an ordinary least squares approach.
-
+\subsection{Choice of sampling method}
 
 
-Let $\bar{w}$ and $\hat{\sigma}^{2}$ denote the sample mean and the sample variance of $w\left ( z \right )$. where $n\left ( \tau  \right )$denotes the number of pairs that are separated by the distance $\tau$.The sample autocorrelation function can be obtained from the following equation:
-
-\begin{equation}
- \hat{\rho}\left ( \tau  \right ) = \frac{\sum\limits_{i=1}^{n\left ( \tau  \right )}\left [ w\left ( z_{i}  \right )-  \bar{w}  \right ]\left [  w\left ( z_{i} +   \tau \right ) -\bar{w} \right ]   }{\left [ n\left ( \tau  \right )-1 \right ] \hat{\sigma}^{2}  } 
-\end{equation}
-
-
-
+\subsection{Seqential Bayesian inference}
