@@ -1,0 +1,76 @@
+\chapter{Bayesian probabilistic theory}
+
+
+In probabilistic theory, two main interpretations prevail: frequentist and Bayesian. The frequentist perspective views probabilities as the long-term frequencies observed in infinite trials. For example, in this context, the statement implies that, over many coin flips, heads are expected roughly half the time.
+
+On the other hand, the Bayesian interpretation associates probability with uncertainty and information, rather than repeated trials. From the Bayesian viewpoint, the statement suggests an equal likelihood of the coin landing heads or tails in the next toss.
+
+Depending on the amount of available data, which may range from zero to infinite, various techniques may be used:
+
+\begin{itemize}[left=0pt]
+ \item when no data is available to characterize the input parameters, a probabilistic model may be prescribed purely by expert judgment;
+ \item when a large amount of data is available, the tools of statistical inference may be fully applied, like the method of moments \citep{wagner2020};
+ \item when both expert judgment and very limited observations are available, Bayesian inference may be resorted to.
+\end{itemize}
+
+One big advantage of the Bayesian interpretation is that it can be used to model our events that do not have long term frequencies. Take, for example, the assessment of the probability of structural damage to a high-rise building, the collapse of a tunnel, or the occurrence of irreversible deformation in bridge piers.This event is anticipated to occur only a limited number of times over the structure's lifetime and is not expected to happen repeatedly. Nevertheless, we ought to be able to quantify our uncertainty about this event and take appropriate actions (see chapter \ref{UQ} and chapter \ref{DT}).
+
+Since data collection is inherently constrained during the progression of most engineering projects, Bayesian theory stands out as a highly effective method. Therefore, this thesis exclusively explores Bayesian methods next, while detailed information on frequentist approaches can be found in \cite{murphy2012}.
+
+
+
+\label{ch:Bayesian}
+
+
+\section{Bayesian inference}
+
+When dealing with a limited number of data points, direct statistical estimation becomes unreliable due to substantial statistical uncertainty in the sample estimates. In this context, $\textit{Bayesian inference}$ provides a solution by integrating prior knowledge on parameters with a small set of observed data points. Operating in this fully probabilistic setting, all unknowns are treated as random vectors. Distribution parameters can be denoted by $\boldsymbol{x}$ as realisations of the random vector $\boldsymbol{X}:\Omega \rightarrow \mathcal{D}_{\boldsymbol{X}}$. The joint probability distribution of the combined random vector $(\boldsymbol{X},\boldsymbol{Y}):\Omega \rightarrow \mathcal{D}_{\boldsymbol{X}} \times {D}_{\boldsymbol{Y}}$ is represented by $\pi(\boldsymbol{x};\boldsymbol{y})$. Leveraging the fundamental sum rule and product rule in probabilistic theory, the \acrlong{PDF} (\acrshort{PDF}) of the parameters and the data can be expressed as
+\begin{equation}
+\pi(\boldsymbol{x}|\boldsymbol{y}) = \frac{{\mathcal{L}(\boldsymbol{x};\boldsymbol{y}) \cdot \pi(\boldsymbol{x})}}{{\pi(\boldsymbol{y})}} \label{equation Bayes}
+\end{equation}
+which is also known as Bayes' theorem or Bayes' rule. In Bayesian terminology, this distribution $\pi(\boldsymbol{x}|\boldsymbol{y})$ is called the \textit{posterior distribution} and it is calculated by \textit{prior} $\pi(\boldsymbol{x})$, \textit{likelihood} $\mathcal{L}(\boldsymbol{x};\boldsymbol{y})\stackrel{\mathrm{def}}{=}\pi(\boldsymbol{y}|\boldsymbol{x})$
+and the \textit{evidence} $\pi(\boldsymbol{y})$. These terms in \cref{equation Bayes} have practical significance that we will briefly summarise next.
+
+\begin{itemize}[left=0pt]
+    \item \textcolor{blue}{Prior $\pi(\boldsymbol{x})$}: In the Bayesian paradigm, before considering the data the parameters $\boldsymbol{x}$ are treated as realisations from a random vector $\boldsymbol{X}$ which is assumed to follow the so-called \textit{prior distribution}.
+
+    \item \textcolor{blue}{Likelihood function $\mathcal{L}(\boldsymbol{x};\boldsymbol{y})$}: The likelihood function is a measure of how well the prescribed parametric distribution $\pi(\boldsymbol{y}|\boldsymbol{x})$ describes the data. To evaluate the likelihood $\mathcal{L}(\boldsymbol{x};\boldsymbol{y})$, some ingredients are needed: a computational forward model $\mathcal{M}$, a set of input parameters $\boldsymbol{x} \in\mathcal{D}_{\boldsymbol{X}}$ that need to be inferred, and a set of experimental data $\boldsymbol{y}$.
+    The forward model $\boldsymbol{x} \rightarrow \boldsymbol{M}(\boldsymbol{x})$ is a mathematical representation of the system under consideration. All models are always simplifications of the real world. Thus, to connect model predictions to the observations $\boldsymbol{y}$, a \textit{discrepancy term} $\epsilon$ shall be introduced. We consider the following well-established format:
+    \begin{equation}
+        \label{eq: discrepancy term}
+        \boldsymbol{y} = \mathcal{M}(\boldsymbol{x}) + \boldsymbol{\varepsilon}
+    \end{equation}
+    where $\epsilon \in \mathbb{R}^{N_{\rm{out}}}$ is the term that describes the discrepancy between an experimental observation $\boldsymbol{y}$ and the model prediction. For the sake of simplicity, we consider it as an additive \textit{Gaussian discrepancy} with zero mean and a covariance matrix $\Sigma$ in this introduction:
+        \begin{equation}
+            \label{eq: Gaussian discrepancy}
+            \boldsymbol{\varepsilon} \in \mathcal{N}(\boldsymbol{\varepsilon}|\boldsymbol{0},\boldsymbol{\Sigma})
+        \end{equation}
+    It is noted that simple Gaussian discrepancy assumption is only one out of many possible models. In a more general setting, other distributions for the discrepancy are used as well \citep{UQdoc}. Due to the widespread used of the additive Gaussian models in engineering disciplines, the thesis is limited to Gaussian type.
+
+    If $N$ independent measurement $\boldsymbol{y_{i}}$ are available and gathered in the data set $\boldsymbol{y} \stackrel{\mathrm{def}}{=} \{{\boldsymbol{y}^{(1)}},\cdots,{\boldsymbol{y}^{(N)}}\}$, the \textit{likelihood } can thus be written as:
+        \begin{equation}
+        \label{eq: single_Gaussian_discrepancy}
+        \mathcal{L}(\boldsymbol{x};\boldsymbol{y}) = \prod_{i=1}^{N} N(\boldsymbol{y_{i}}|\mathcal{M}(\boldsymbol{x}),\boldsymbol{\Sigma})
+        \end{equation}      
+\end{itemize}
+
+
+Consider a dataset  
+comprising independent realisations of an underlying random vector with an associated, unknown \acrlong{PDF} (\acrshort{PDF}).
+
+ 
+
+
+
+
+\section{Exact inference}
+\subsection{Variant elimination}
+\subsection{Belief propagation}
+
+\section{Approximation inference}
+
+\subsection{Expectation maximization algorithm}
+
+\subsection{Ensemble Kalman filter}
+\subsection{Sequential Monte Carlo}
+\subsection{Markov Chain Monte Carlo}

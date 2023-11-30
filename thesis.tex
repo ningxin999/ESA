@@ -16,7 +16,7 @@
 \usepackage{cleveref}
 \usepackage{float}
 \usepackage{parskip}
-\usepackage{setspace}
+%\usepackage{setspace}
 \usepackage{natbib}
 \usepackage{booktabs}
 \usepackage{makecell}
@@ -27,9 +27,13 @@
 \usetikzlibrary{matrix}
 \usepackage{adjustbox}
 \usetikzlibrary{positioning}
+\usepackage[sort=use,acronym]{glossaries}
 
 
+
+\makeglossaries
 \makenomenclature
+
 \crefname{figure}{Figure}{Figures}
 \crefname{equation}{Equation}{Equations}
 \include{thesis.preamble}
@@ -37,10 +41,7 @@
 \titlespacing{\section}{0pt}{\dimexpr\parskip-0.5ex}{\dimexpr\parskip-0.25ex}
 \titlespacing{\subsection}{0pt}{\dimexpr\parskip-0.25ex}{\dimexpr\parskip-0.5ex}
 
-\setlength{\textfloatsep}{5pt plus 1.0pt minus 2.0pt}
-\setlength{\abovecaptionskip}{2pt} 
-\setlength{\belowcaptionskip}{-10pt} 
-\raggedbottom
+
 
 
 
@@ -63,22 +64,27 @@
 %\input{quotes/quotes}
 
 \body
-\input{introduction/introduction}
-\input{State/state}
-\input{Active learning for bayesian inference/Active learning for bayesian inference}
-\input{MathematicalFundation/MathematicalFundation}
-\input{Work_Plan/Work_Plan}
+\input{Nomenclature/Nomenclature}
+\printnomenclature[1in]
+\input{ACRONYMS/ACRONYMS}
+\printglossary[type=\acronymtype]
 % body of thesis comes here
+\input{introduction/introduction}
+\input{ProbTheory/probabilisticTheory}
+\input{UQ/UQ}
+\input{DT/DT}
+\input{Work_Plan/Work_Plan}
+
 
 \input{conclusion/conclusion}
-\input{Nomenclature/Nomenclature}
+
 
 
 \appendix
 % appendices come here
 
 
-\printnomenclature[1in]
+
 %\bibliographystyle{unsrtnat}
 
 \bibliographystyle{apacite}
