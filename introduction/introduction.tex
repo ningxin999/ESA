@@ -1,5 +1,5 @@
 \chapter{Introduction}
-
+\label{intro}
 
 \section{Background}
 Offshore monopiles are increasingly favored in wind farm installations due to their advantages in clean energy generation and easy deployment. These cylindrical steel structures are driven into the seabed to provide a stable foundation for wind turbines. While offshore wind energy presents a promising source of clean and sustainable power, the utilization of offshore monopiles has introduced certain engineering challenges. One of the key concerns associated with offshore monopiles is the need to address the potential issues related to excessive pile displacements induced during their installation and operation\citep{byrne2003,randolph2005}. Excessive pile movements can lead to significant displacements and rotations in supporting structures, which, in turn, may result in damage or structural instability. Consequently, it becomes crucial to accurately predict and manage pile deformations when designing and analyzing support systems for offshore monopile installations.
@@ -14,12 +14,12 @@ In practice, through adaptive Bayesian updating soil parameters and constructing
 
 \section{Problem statement}
 
-Modern pile installation and proper estimation is becoming increasingly complex and vital to the reliability and permanence of the foundation in question. However, in the construction process, uncertainties and insufficient information about the soil parameters lead to inaccurate predictions of pile-soil response and bearing capacities. The source of soil uncertainties may come from various reasons, such as lack of uniformity between in-situ test and laboratory experiment; spatial variability of soil profile and rationality of the constitutive model, etc. Dealing with different uncertainties sources is a challenging task. One typical soil profile can be illustrated in \cref{fig:fig-Cowden}, which shows uncertainties sources:
+Modern pile installation and proper estimation is becoming increasingly complex and vital to the reliability and permanence of the foundation in question. However, in the construction process, uncertainties and insufficient information about the soil parameters lead to inaccurate predictions of pile-soil response and bearing capacities. The source of soil uncertainties may come from various reasons, such as lack of uniformity between in-situ test and laboratory experiment; spatial variability of soil profile and rationality of the constitutive model, etc. Dealing with different uncertainties sources is a challenging task. One typical soil profile can be illustrated in \cref{fig: Cowden_cpt}, which shows uncertainties sources:
 
-\setlength{\parskip}{0pt}
-\setlist[itemize]{itemsep=0pt,topsep=0pt,parsep=0pt,partopsep=0pt}
+% \setlength{\parskip}{0pt}
+% \setlist[itemize]{itemsep=0pt,topsep=0pt,parsep=0pt,partopsep=0pt}
 
-\begin{itemize}
+\begin{itemize}[left=0pt]
 
     \item Fluctuating curve indicates the spatial  variability
     \item Non-uniformity exists between in-situ test and laboratory experiment
@@ -35,13 +35,12 @@ of dimensionality \citep{verleysen2005}. The surrogate computation
 may even be intractable when the number of input parameters is large \citep{lataniotis2019}.
 
 
-\begin{figure}[H]
-    \centering
+\begin{figure}[htbp]
+    \center
     \includegraphics[width = 90mm]{Figures/figure-Cowden.pdf}
     \caption{Stiffness characteristics at Cowden from \protect\cite{zdravkovic2020}}
-    \label{fig:fig-Cowden}
+    \label{fig: Cowden_cpt}
 \end{figure}
-
 
 To address these challenges in real time, digital twin (DT) has gained popularity in handling abundant data and predict the pile's response in a more organized and accurate manner \citep{wang2021}. DT makes full use of data such as physical models, sensor updates and operating history, and integrates simulation processes to real-time reproduce the dynamics of a physical system in the virtual space. More importantly, the DT model cannot only describe the current state of the physical entity, but also predict the future state. However, state-of-the-art digital twins are still relying on considerable expertise and deployment resources \citep{kapteyn2021}, leading to an only one-off implementation and remaining limitation on providing adaptive digital models on unique offshore piles. Thus, unified and scalable models should be developed and incorporated into digital twin to enable a intelligent decision making. Details about the need for unified and scalable digital twin for piles are outlined next.
 
@@ -64,7 +63,7 @@ The demand for efficiency, reliability, and safety continues to grow in offshore
 \section{Objectives and outline}
 
 The underlying objective of this thesis is to develop a robust and scalable digital twin model for offshore piles. This endeavor will leverage cutting-edge methodologies in surrogate modeling and uncertainty quantification, all geared towards facilitating extensive predictive digital twin capabilities. In particular, the specific goals of this thesis are:
-\begin{itemize}
+\begin{itemize}[left=0pt]
     \item Develop a surrogate model suitable for offshore piles characterized by high input dimensions.
     
     \item Accelerate Bayesian inversion calculations for soil parameters to reduce the uncertainties, and providing real-time pile response predictions through adaptive enrichment of observed monitoring data.

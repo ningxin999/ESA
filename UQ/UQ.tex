@@ -1,6 +1,10 @@
-\chapter{State of the Art Review on UQ techniques}
+\chapter{Uncertainty quantification in parameter identification}
 
-\label{ch:State}
+\label{UQ}
+\section{Inverse problem}
+\subsection{Forward problem}
+
+\subsection{High dimensional problem}
 
 \section{Surrogate model-Spectral method}
 
@@ -10,6 +14,11 @@ model runs are required. However, if the model is costly, only a few model evalu
 the input-output relation of the original model well. Since the surrogate model is cheap to evaluate, uncertainty quantification can be performed at a low cost by using the surrogate
 model instead of the original model. Therefore, surrogate modelling aims at constructing a metamodel that provides an accurate approximation to the original model while requiring as few model evaluations as possible for its construction. A surrogate model $\tilde{\mathcal{M}}$ can be expressed as:
 \begin{equation}
+\label{eq:surrogate_model}
+    \tilde{\mathcal{M}}(\boldsymbol{X})  \overset{\mathrm{def}}{=} \mathcal{M}(\boldsymbol{X}) - \mathcal{R}(\boldsymbol{X})
+\end{equation}
+\begin{equation}
+\label{eq:surrogate_model}
     \tilde{\mathcal{M}}(\boldsymbol{X})  \overset{\mathrm{def}}{=} \mathcal{M}(\boldsymbol{X}) - \mathcal{R}(\boldsymbol{X})
 \end{equation}
 where $\mathcal{R}$ is the residual between the original model and the surrogate.
@@ -48,14 +57,6 @@ When faced with large-scale forward models characteristic of many engineering an
 
 \subsection{Inverse problems}
 
-Bayesian theorem provides a possible tool to understand and update the uncertainties for the priors as shown in \cref{equation 1.1}.
-\setlength\abovedisplayskip{2pt}
-\setlength\belowdisplayskip{2pt}
-\begin{equation}
-P(A|B) = \frac{{P(B|A) \cdot P(A)}}{{P(B)}} \label{equation 1.1}
-\end{equation}
-$P(A|B)$: posterior: Distribution of soil parameters;$P(B|A)$:likelihood: observed data and FE simulation based on priors; $P(A)$: prior: Soil parameters from lab/field.
-
 \subsection{Bayesian inference}
 
 \subsection{Bayesian calibration}
@@ -68,24 +69,24 @@ $P(A|B)$: posterior: Distribution of soil parameters;$P(B|A)$:likelihood: observ
     \centering
     \includegraphics[width = 90mm]{Figures/figure-CDF.pdf}
     \caption{Sampling using an inverse CDF}
-    \label{fig:fig_CDF_sample}
+    \label{fig: CDF}
 \end{figure}
 
-The simplest method for sampling from a univariate distribution is based on the inverse probability transform. As shown in \cref{fig:fig_CDF_sample}, if we can get the cumulative probability density function, then we can easily generate samples by computing $x$ = CDF($\mathcal{U}$). $\mathcal{U}$ follows uniform distribution $\mathcal{U} \sim U(0,1)$.
+The simplest method for sampling from a univariate distribution is based on the inverse probability transform. As shown in \cref{fig: CDF}, if we can get the cumulative probability density function, then we can easily generate samples by computing $x$ = CDF($\mathcal{U}$). $\mathcal{U}$ follows uniform distribution $\mathcal{U} \sim U(0,1)$.
 
 
 
 
 \subsubsection{Rejection sampling}
 When the inverse cdf method cannot be used, one simple alternative is to use rejection sampling. In rejection sampling, we create a proposal distribution $q(x)$ which satisfies $Mq(x) \geq \tilde{p}(x)$, for some constant $M$, where $\tilde{p}(x)$ is an unnormalized version of $p(x)$ (i.e., $p(x)$ = $\tilde{p}(x)/Z$ for some unknown constant $Z$). The function $Mq(x)$ provides an upper envelope for $\tilde{p}$. We then sample $x \sim q(x)$, which corresponds to picking a random $x$ location, and then we sample $u \sim U(0,1)$ which corresponds to picking a random height ($y$ location) under the
-envelope. If $u \geq \frac{\tilde{p}(x)}{Mq(x)}$, we reject the sample,otherwise we accept it. See \cref{fig:fig-rejectsampling}, where acceptance region is shown shaded, and the rejection region is the white region between the shaded zone and the upper envelope.
-\begin{figure}[H]
+envelope. If $u \geq \frac{\tilde{p}(x)}{Mq(x)}$, we reject the sample,otherwise we accept it. See \cref{fig: rejectsampling}, where acceptance region is shown shaded, and the rejection region is the white region between the shaded zone and the upper envelope.
+\begin{figure}[htbp]
     \centering
     \includegraphics[width = 140mm]{Figures/figure-rejectionsampling.pdf}
     \caption{Schematic illustration of rejection sampling from \protect\cite{andrieu2003}}
-    \label{fig:fig-rejectsampling}
+    \label{fig: rejectsampling}
 \end{figure}
-But, large-dimensional spaces tend to be very empty, and the chances that this method accepts a point may be dramatically low when working with multidimensional spaces.
+But, large-dimensional spaces tend to be very empty, and the chances that this method accepts a point may be dramatically low when working with multidimensional spaces. \acrshort{MCMC}
 
 \subsubsection{Importance sampling}
 
@@ -95,6 +96,8 @@ Often, in practical Bayesian models, it is not possible to obtain samples direct
 
 
 \subsubsection{Markov chain Monte Carlo}
+
+\acrshort{MCMC}
 Some Monte Carlo methods, including rejection sampling, importance sampling and particle filtering. The trouble with these methods is that they do not work well in high
 dimensional spaces. The most popular method for sampling from high-dimensional distributions
 is Markov chain Monte Carlo or MCMC. In a survey by \textit{SIAM News}
@@ -102,9 +105,9 @@ is Markov chain Monte Carlo or MCMC. In a survey by \textit{SIAM News}
 top 10 most important algorithms of the 20th century \citep{murphy2012}.
 \begin{figure}[H]
     \centering
-    \includegraphics[width = 150mm]{Figures/figure-markov_process.pdf}
+    \includegraphics[width = 140mm]{Figures/figure-markov_process.pdf}
     \caption{Markov Chain process}
-    \label{fig:figure-markovchain}
+    \label{fig: markovchain}
 \end{figure}
 
 
@@ -112,3 +115,16 @@ top 10 most important algorithms of the 20th century \citep{murphy2012}.
 
 
 \subsection{Seqential Bayesian inference}
+
+
+\section{Sequential enrichment for surrogate model}
+
+Traditional large-scale physics-based models are intractable to solve real-time, many-query context problem. 
+
+
+Instead of sampling the whole experimental design at once, it has been proposed to use sequential enrichment. Starting with
+a small experimental design, additional points are chosen based on the last computed sparse
+solution. In the context of machine learning, sequential sampling is also known as active learning.  In all cases, numerical examples show that the sequential strategy generally leads to solutions with
+a smaller validation error compared to non-sequential strategies
+
+\section{Sensitivity analysis}
