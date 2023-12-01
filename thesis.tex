@@ -1,5 +1,7 @@
-\documentclass[a4paper,12pt,twoside,scale = 0.8]{report}
-\usepackage[left=3cm,right=2.5cm,top=2.8cm,bottom=2.5cm]{geometry}
+\documentclass[a4paper,12pt,twoside]{report}
+%\documentclass[a4paper,12pt,twoside,times,numbered]{report}
+\usepackage{geometry}
+\geometry{includeheadfoot,left=1in,right=1in,top=1cm,bottom=1cm,asymmetric,bindingoffset=0pt,nomarginpar}
 \usepackage[table]{xcolor}
 \usepackage{amssymb}
 \usepackage{hyperref}
@@ -29,7 +31,11 @@
 \usetikzlibrary{positioning}
 \usepackage[sort=use,acronym]{glossaries}
 
-
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue}
 
 \makeglossaries
 \makenomenclature
@@ -64,10 +70,6 @@
 %\input{quotes/quotes}
 
 \body
-\input{Nomenclature/Nomenclature}
-\printnomenclature[1in]
-\input{ACRONYMS/ACRONYMS}
-\printglossary[type=\acronymtype]
 % body of thesis comes here
 \input{introduction/introduction}
 \input{ProbTheory/probabilisticTheory}
