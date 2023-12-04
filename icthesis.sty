@@ -55,6 +55,8 @@
 
 \def\abstract{
 \cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Abstract}
   \begin{center}{
     \large\bf Abstract}
   \end{center}
@@ -69,6 +71,7 @@
   \par
 }
 \pagestyle{plain}
+
 % \newenvironment{acknowledgements}{
 %   \cleardoublepage
 %   \begin{center}{
@@ -122,13 +125,15 @@
     \cleardoublepage
     \pagestyle{uheadings}
     \input{Nomenclature/Nomenclature}
-    \printnomenclature[1in]
+    \printnomenclature  
     \pagestyle{plain}
 
     \cleardoublepage
     \pagestyle{uheadings}
+
     \input{ACRONYMS/ACRONYMS}
-    \printglossary[type=\acronymtype]
+    % \printglossary[style=mcolindex,type=\acronymtype,nonumberlist]
+ \printglossary[type=\acronymtype]    
     \pagestyle{plain}
     
     \cleardoublepage    
