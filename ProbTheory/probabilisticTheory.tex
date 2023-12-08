@@ -109,7 +109,7 @@ Choices for the point estimation above disregards the estimation uncertainty in 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width = 140mm]{Figures/figure-COV.pdf}
-    \caption{Example sets of ($x,y$) points with different COV. Source: $\href{https://commons.wikimedia.org/wiki/File:Correlation_examples2.svg?uselang=zh-cn}{Wikipedia}$}
+    \caption{Example sets of ($x,y$) points with different \acrshort{COV}. Source: $\href{https://commons.wikimedia.org/wiki/File:Correlation_examples2.svg?uselang=zh-cn}{Wikipedia}$}
     \label{fig: COV}
 \end{figure}
 As  the full posterior distribution is an \textit{M}-dimensional object, which is inherently difficult to comprehend, one is typically also interested in the \textit{posterior marginals}. The distribution of the marginalised random variable $X_{i}|\mathcal{Y}$ is given by (see \cref{eq: Margin_Post}):
@@ -133,6 +133,7 @@ It summarises the uncertainty about the model output considering also the discre
     \pi(\boldsymbol{x}|\mathcal{Y}) \pi(\boldsymbol{y}|\boldsymbol{x}) {\rm{d}} \boldsymbol{x}
 \end{equation}
 \section{Computational methods for Bayesian inference}
+\label{section: Computational methods}
 The practical computation of posterior distributions $\pi(\boldsymbol{x}|\mathcal{Y})$ is not trivial. Because computing evidence $\pi(\mathcal{Y})$ is usually not a tractable problem, analytical solutions thus require more restrictions on the model. It can be only calculated analytically if it is given in a closed form. A common strategy we usually choose is a \textit{conjugate prior} \citep{gelman1995} to the likelihood, so the integral can be represented analytically. For example, in a static Bayesian network, choices such as \textit{Variant elimination} and \textit{Belief propagation} \citep{murphy2012} can be seen. In the realm of a dynamic sequential model, \textit{kalman filtering} \citep{nguyen2016} gives an closed form for the parameter identification. However, in the general cases, the solution to the posterior can be rarely analytical due to a complex model or high computation for the evidence $\pi(\mathcal{Y})$. Thus, we need to resort to approximation method.
 
 There are usually two categories of approximation methods: \textit{optimisation based approximation} and \textit{Monte Carlo sampling} methods.
@@ -145,32 +146,269 @@ There are usually two categories of approximation methods: \textit{optimisation 
     \textit{Monte Carlo sampling} has the advantages that: (1) It is more straightforward and flexible. (2) It is guaranteed to find the globally optimal solution given enough time and samples. However, In order to quickly reach a good solution, \textit{Monte Carlo sampling} take more time and require choosing an appropriate sampling technique. 
 \end{itemize}
 
-\textit{Optimisation based approximation} and \textit{Monte Carlo sampling} are a big topic. Current studies on these are still very active with numerous techniques proposed in the past few years. More discussions can be found in \cite{murphy2012} and \cite{blei2017}. 
+In short mentioned above, \textit{Monte Carlo sampling} is asymptotically exact, accurately approximating the target distribution with increasing samples. In contrast, \textit{Optimisation based approximation} lacks guarantees but yields faster results. Both \textit{Optimisation based approximation} and \textit{Monte Carlo sampling} are significant topics. Current studies on these are still very active with numerous techniques proposed in the past few years. More details can be found in \cite{murphy2012} and \cite{blei2017}.
 
-\textit{Monte Carlo sampling} is asymptotically exact; \textit{Optimisation based approximation} is not. In the limit, \textit{Monte Carlo sampling} will exactly approximate the target distribution. \textit{Optimisation based approximation} comes without warranty.
+It is worthy noted that it is not always the case \textit{Monte Carlo sampling} is better than \textit{Optimisation based approximation} or vice versa. The choice for approximate Bayesian method is totally problem-specified. Faster posterior approximation requires trading off additional accuracy. In this thesis, however, we expect to find the global optimal values and hope the solution with guarantee. Therefore, our thesis is only focused on \textit{Monte Carlo sampling} as detailed in the next section.
 
-In this thesis, however, we expect to find the global optimal values and hope the solution with guarantee. Therefore, our primary is only focused on \textit{Monte Carlo sampling}. 
-
-
-\section{Approximation inference}
-
-\subsection{Expectation maximization algorithm}
-
-\subsection{Ensemble Kalman filter}
-\subsection{Sequential Monte Carlo}
+\section{Monte Carlo sampling}
+In this section, we will discuss the class of algorithms based on the idea of \textit{Monte Carlo approximation}. The idea is straightforward: generate $s$ samples from the $t_{th}$ step posterior, $\boldsymbol{x}_{t}^{s} \sim  \pi(\boldsymbol{x}_{t}|\mathcal{Y}_{t})$, in which $t$ represents the time in a dynamic model (state-space model) and $\mathcal{Y}_{t}$ denotes the observation at $t_{th}$ step. Because most engineering projects are carried out in stages as shown in \cref{fig: Sequential Bayesian}, a recursive updating and sampling scheme is required across the multiple stages in the dynamic model. The introduction of subscript $t$ aims to elucidate the sampling process at different stages. Subsequently, these samples are used to aggregate any quantity of interest $\mathbb{E}[ f|\mathcal{Y}_{t}] \approx \frac{1}{S} \sum_{s=1}^{S}f(\boldsymbol{x}_{t}^{s})$ given suitable function $f$. By generating enough samples, we can achieve any desired level of accuracy we like.
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width = 140mm]{Figures/figure-particle filter.pdf}
-    \caption{Bayesian inference in 2D space}
-    \label{fig: particle filter}
+    \includegraphics[width = 140mm]{Figures/figures-Sequential_Bayesian.pdf}
+    \caption{Sequential Bayesian updating}
+    \label{fig: Sequential Bayesian}
 \end{figure}
+\subsection{Inverse probability transform}
+The simplest method for sampling from a univariate distribution is based on the \textit{inverse probability transform}. As shown in \cref{fig: CDF}, if we can get the \acrfull{CDF}, then we can easily generate samples by computing $\boldsymbol{x}_{t}^{s}$ = CDF($\mathcal{U}$). $\mathcal{U}$ follows uniform distribution $\mathcal{U} \sim U(0,1)$ using a \textit{pseudo random number generator}.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width = 90mm]{Figures/figure-CDF.pdf}
+    \caption{Sampling using an inverse CDF}
+    \label{fig: CDF}
+\end{figure}
+\subsection{Rejection sampling}
+When the inverse \acrshort{CDF} method cannot be used, one simple alternative is to use \textit{rejection sampling}. In \textit{rejection sampling}, we create a proposal distribution $q(\boldsymbol{x})$ which satisfies $Mq(\boldsymbol{x}) \geq \tilde{\pi}(\boldsymbol{x})$, for some constant $M$, where $\tilde{\pi}(\boldsymbol{x})$ is an unnormalized version of $\pi(\boldsymbol{x})$ (i.e., $\pi(\boldsymbol{x})$ = $\tilde{\pi}(\boldsymbol{x})/Z$ for some unknown constant $Z$). The function $Mq(\boldsymbol{x})$ provides an upper envelope for $\tilde{\pi}$. We then sample at time stage $t$: $\boldsymbol{x}_{t}^{s} \sim q(\boldsymbol{x}_{t})$, which corresponds to picking a random $\boldsymbol{x}_{t}^{s}$ location, and then we sample $u \sim U(0,1)$ which corresponds to picking a random height ($y$ location) under the
+envelope. If $u \geq \frac{\tilde{\pi}(\boldsymbol{x}_{t}^{s})}{Mq(\boldsymbol{x}_{t}^{s})}$, we reject the sample, otherwise we accept it. See \cref{fig: rejectsampling}, where acceptance region is shown shaded, and the rejection region is the white region between the shaded zone and the upper envelope.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width = 140mm]{Figures/figure-rejectionsampling.pdf}
+    \caption{Schematic illustration of \textit{rejection sampling}. Source: \protect\cite{andrieu2003}}
+    \label{fig: rejectsampling}
+\end{figure}
+But, large-dimensional spaces tend to be very empty, and the chances that this method accepts a point may be dramatically low when working with multidimensional spaces.
+\subsection{Importance sampling}
+We now describe a Monte Carlo method known as \textit{importance sampling} for approximating integrals of the form:
+\begin{equation}
+    \label{eq: MC_intergral}
+    E[f(\boldsymbol{x}_{t})] = \int f(\boldsymbol{x}_{t})\pi(\boldsymbol{x}_{t}) d\boldsymbol{x}_{t}
+    \approx \frac{1}{S}\sum_{s=1}^{S} f(\boldsymbol{x}_{t}^{s})
+\end{equation}
+where $\boldsymbol{x}_{t} \sim \pi(\boldsymbol{x}_{t})$
+The idea of \textit{Monte Carlo sampling} is to simply sample $\boldsymbol{x}_{t}$ from the distribution $\pi(\boldsymbol{x}_{t})$. However, when it comes to tricky target $\pi(\boldsymbol{x}_{t})$, the above estimation can be less efficient, meaning it requires huge amounts of samples to ensure the accuracy. Then it is better to sample from a proposal form $q(\boldsymbol{x}_{t}) \propto  f(\boldsymbol{x}_{t})\pi(\boldsymbol{x}_{t})$ than to sample from $\pi(\boldsymbol{x}_{t})$ itself.
+
+The idea of \textit{importance sampling} is: draw the $t_{th}$ step samples from a proposal distribution $q(\boldsymbol{x}_{t})$ and re-weight the integral using importance weights so that the correct distribution is targeted. It then uses these samples to estimate the integral as follows:
+\begin{equation}
+    \label{eq: IS_integral}
+    E[f(\boldsymbol{x}_{t})] = \int f(\boldsymbol{x}_{t})\pi(\boldsymbol{x}_{t}) d\boldsymbol{x}_{t} = \int f(\boldsymbol{x}_{t})\frac{\pi(\boldsymbol{x}_{t})}{q(\boldsymbol{x}_{t})}q(\boldsymbol{x}_{t}) d\boldsymbol{x}_{t}
+    \approx \frac{1}{S} \sum_{s=1}^{S} f(\boldsymbol{x}_{t}^{s})\frac{\pi(\boldsymbol{x}_{t}^{s})}{q(\boldsymbol{x}_{t}^{s})}
+\end{equation}
+where $\frac{\pi(\boldsymbol{x}_{t}^{s})}{q(\boldsymbol{x}_{t}^{s})}$ is the importance weight. With a proper proposal distribution $q(\boldsymbol{x}_{t})$, the integral estimation can be close as possible to the true value (improving the approximation means decreasing the variance of estimation $\mathrm{Var}(\boldsymbol{x}_{t}) = \mathbb{E}[{\boldsymbol{x}_{t}}^2] - {\mathbb{E}[\boldsymbol{x}_{t}]}^2$). However, in practice, the choice for the $q(\boldsymbol{x}_{t}^{s})$ is not satisfying. This is a general difficult task, especially in high dimensions.
+
 
 \subsection{Markov Chain Monte Carlo}
+Closed-form expressions for the posterior distribution in \cref{equation Bayes} cannot be derived in general. The exceptions are some linear models with conjugate distributions which were mentioned in \cref{section: Computational methods}. Compared with non-iterative methods above, \acrfull{MCMC} methods are a class of algorithms that allow one to sample from probability distributions based on the construction of a Markov chain, which asymptotically behaves to the \acrshort{PDF} which is to be sampled.
+
+\acrshort{MCMC} methods were a breakthrough for solving Bayesian inverse problems and since then it has gained tremendous popularity in engineering areas. In a survey by $\href{https://archive.siam.org/pdf/news/637.pdf}{\textit{SIAM News}}$, \acrshort{MCMC} was placed in the top 10 most important algorithms of the 20th century. Originally developed by statistical mechanics, it is used to construct \textit{Markov chains} to sample a selected \textit{target distribution}. In the context of Bayesian updating, this \textit{target distribution} is the posterior in our analysis. Based on the \textit{Markov chains}, every stage depends only on the last previously attained stage. We consider here one discrete \textit{Markov chain} of the type $\mathcal{X}_{t} =\{\boldsymbol{x}_{t}^{1},\cdots,\boldsymbol{x}_{t}^{N_{\mathcal{X}}}\}$, in which $N_{\mathcal{X}}$ is the number of chain iterations, $\mathcal{X}_{t}$ are the samples from sampling process and $t$ is stage number. They start from an arbitrary state $\boldsymbol{x}_{t}^{1} \in \mathcal{D}_{\bm{X}}$ that is updated sequentially based on a \textit{transition kernel}. This kernel is to ensure that \textit{Markov chains} fulfil \textit{detailed balance} condition and are reversible, i.e., that the dynamics of the chains is not affected by the direction of iterative sampling. We omit an in-depth discussion of those properties and refer interest readers to exhaustive resources on the matter in \cite{murphy2012}.
+
+Nowadays, practitioners can choose from a vast of \acrshort{MCMC} algorithms, ranging from the classical \acrfull{MH}, to advanced \textit{Hamiltonian mechanics-inspired samplers}, \textit{transitional MCMC algorithm} and \textit{ensemble algorithms}. In the following, we will present two popular standard \acrshort{MCMC} algorithms that are used in the context of Bayesian inference, but other alternative more effective sampling methods can be also easily implemented.
+\subsubsection{\acrfull{MH}}
+The basic idea in \acrshort{MH} is to define a proposal distribution $q(\boldsymbol{x}_{t}^{s+1}|\boldsymbol{x}_{t}^{s}),s=1,\cdots,N_{\mathcal{X}}$, between two adjacent samples from the current sample point $\boldsymbol{x}_{t}^{s}$ to the new point $\boldsymbol{x}_{t}^{s+1}$. If we have the first sample $\boldsymbol{x}_{t}^{1}$, we can generate the later samples for any number $N_{\mathcal{X}} > 1$. These samples can be summarized to describe the distribution of inversed parameters $\boldsymbol{x}_{t}$. For any given distribution $\pi(\boldsymbol{x}_{t})$, we define the acceptance function, which is used to decide whether to accept this move, as follows:
+\begin{equation}
+    \label{eq: accept_ratio_1}    f(\boldsymbol{x}_{t}^{s+1}|\boldsymbol{x}_{t}^{s})=\rm{min}(1,\alpha)
+\end{equation}
+\begin{equation}
+    \label{eq: accept_ratio_2}    
+\alpha = {\rm{min}} (1,
+\frac{q(\boldsymbol{x}_{t}^{s}|\boldsymbol{x}_{t}^{s+1})  \pi(\boldsymbol{x}_{t}^{s+1}|\mathcal{Y}_{t})}
+{q(\boldsymbol{x}_{t}^{s+1}|\boldsymbol{x}_{t}^{s})   \pi(\boldsymbol{x}_{t}^{s}|\mathcal{Y}_{t})} )
+\end{equation}
+In practice, in order to accept and reject the proposed candidates with probability in \cref{eq: accept_ratio_1} and \cref{eq: accept_ratio_2}, one usually samples a random variate $u \in (0,1)$ from the standard uniform distribution, i.e., $U \sim \mathcal{U}(0,1)$, and compares it to the probability $\alpha$. If $\alpha > 1$, which implies $q(\boldsymbol{x}_{t}^{s}|\boldsymbol{x}_{t}^{s+1})  \pi(\boldsymbol{x}_{t}^{s+1}|\mathcal{Y}_{t})  > q(\boldsymbol{x}_{t}^{s+1}|\boldsymbol{x}_{t}^{s})   \pi(\boldsymbol{x}_{t}^{s}|\mathcal{Y}_{t})$, we accept the candidate sampled point $\boldsymbol{x}_{t}^{(\star)}$ from $q(\boldsymbol{x}_{t}^{s}|\boldsymbol{x}_{t}^{s+1})$. If $\alpha < 1$, we accept the candidate point $\boldsymbol{x}_{t}^{(\star)}$ with probability $\alpha$. If the candidate is accepted, the new sample point $\boldsymbol{x}_{t}^{(\star)}$ is $\boldsymbol{x}_{t}^{s+1}$, otherwise stays the same as $\boldsymbol{x}_{t}^{s}$. A commonly used proposal distribution is Gaussian distribution centered on the current point $\boldsymbol{x}_{t}^{s}$. The acceptance function can be modified as:
+\begin{equation}
+    \label{eq: accept_function_Gaussian_distribution}    
+f(\boldsymbol{x}_{t}^{s+1}|\boldsymbol{x}_{t}^{s})={\rm{min}}(1,\alpha)={\rm{min}}(1,\frac{q(\boldsymbol{x}_{t}^{s+1})}
+{q(\boldsymbol{x}_{t}^{s})})
+\end{equation}
+\begin{algorithm}    
+    \caption{\acrlong{MH} algorithm at $t_{th}$ step}
+    \label{Algorithm:MH}
+    \KwData{ $q(\boldsymbol{x}_{t})$: Proposal distribution; $\pi(\boldsymbol{x}_{t}|\mathcal{Y})$: Target posterior.}
+    \KwResult{MCMC samples at $t_{th}$ stage: $\mathcal{X}_{t} = \{\boldsymbol{x}_{t}^{1},\cdots,\boldsymbol{x}_{t}^{N_{\mathcal{X}}}\}$}
+    Initialization $\boldsymbol{x}_{t}^{1} \in \mathcal{D}_{\bm{X}}$\; 
+    \For{$s \gets 2 \ to  \ N_{\mathcal{X}}$}{
+        Sample $\boldsymbol{x}_{t}^{s+1} \sim q(\boldsymbol{x}_{t}^{s+1}|\boldsymbol{x}_{t}^{s})$;\\
+        Compute acceptance probability $\alpha$;\\
+        Compute $f\left(\boldsymbol{x}_{t}^{s+1}|\boldsymbol{x}_{t}^s\right)=\min{\left(1,\alpha\right)}$;\\
+        Sample $u \sim \mathcal{U}\left(0,1\right)$;\\
+        Set candidate sample $\boldsymbol{x}_{t}^{(\star)}$ to $\boldsymbol{x}_{t}^{s+1}$ with probability $\alpha$;} 
+\end{algorithm}
+The process of \acrshort{MH} is shown in \ref{Algorithm:MH}. It is worth mentioning that although the proposal distribution $q(\boldsymbol{x}_{t})$ can be any distribution, the closer it is to the actual target distribution $\pi(\boldsymbol{x}_{t}|\mathcal{Y})$, the more efficient the chain mixture would be. Also, we need to assign an initial position $\boldsymbol{x}_{t}^{1} \in \mathcal{D}_{\bm{X}}$ that is not zero probability. Although the initial position does not affect the convergence of the sampling, a good initial guess would help to accelerate mixing for a Markov chain. With more paralleled $N_{\rm{chain}}$ chains and iterative steps used ($\mathcal{X}_{t} = \{ \mathcal{X}_{t\_1},\cdots,\mathcal{X}_{t\_N_{chain}}\}$), where each chain $\mathcal{X}_{t\_i}$ contains $\{ \boldsymbol{x}_{t\_i}^{1},\cdots,\boldsymbol{x}_{t\_i}^{N_{\mathcal{X}}}\}$, the convergence will be improved accordingly. One schematic figure of the \acrshort{MH} algorithm for sampling from a mixture of two 1D Gaussian can be seen in \cref{fig: MH_example}.
 \begin{figure}[htbp]
     \centering
     \includegraphics[width = 90mm]{Figures/figure-MCMC_sampling.pdf}
-    \caption{\acrshort{MCMC} sampling}
-    \label{fig: MCMC_sample}
+    \caption{An schematic figure of the \acrshort{MH} algorithm for sampling from a mixture 1D Gaussian at $t_{th}$ stage}
+    \label{fig: MH_example}
 \end{figure}
+\subsubsection{\acrfull{AIES}}
+Many \acrshort{MCMC} algorithms perfom poorly when the target (i.e., posterior) distribution $\pi(\boldsymbol{x}_{t}|\mathcal{Y})$ exhibits strong, priorly unknown, inter-parameter correlation. For the \acrshort{MH}, for example, it is the challenging to construct a proposal distribution that propose states in the high-probability regions of the parameter space. This results in low acceptance rates which can only be improved by considerable tuning efforts. The \acrshort{AIES} originally presented in \citep{goodman2010} alleviates this problem. Its invariance to affine transformations means that if there exists an affine transformation of the \textit{difficult-to-sample} (by standard \acrshort{MCMC} methods) target distbution to an \textit{easier-to-sample} target distribution, \acrshort{AIES} samples both distributions equally well without explicitly requiring this affine transformation.
+
+The \acrshort{AIES} algorithm presented in \ref{Algorithm:AIES}, simultaneously generates an \textit{ensemble} of $N_{chain}$ \textit{Markov chains} at the $t_{th}$ stage ($\mathcal{X}_{t} = \{ \mathcal{X}_{t\_1},\cdots,\mathcal{X}_{t\_N_{chain}}\}$). Each chain is called a \textit{walker}. At the $\{s_{th}\}_{s \in \{1,\cdots,N_{\mathcal{X}}\}}$ iteration, all \textit{Markov chain states} $\{\boldsymbol{x}_{t\_i}^{s}\}_{i \in \{1,\cdots,N_{chain}\}}$ are updated \textit{walker by walker}. To update the $i_{th}$ \textit{walker}, the algorithm randomly picks a \textit{conjugate walker} from $j \in \{ 1,\cdots,N_{chain}\} \backslash i$, i.e., excluding the current $i_{th}$ walker. The affine invariance property is then achieved by generating proposals according to a so-called \textit{stretch move}. This refers to proposing a new candidate along a straight line between the current walker and the \textit{conjugate walker} with
+\begin{equation}
+    \label{eq: AIES walker}
+\boldsymbol{x}_{t}^{(\star)}
+=
+\boldsymbol{x}_{t\_i}^{(s)}
++
+z \cdot 
+(\boldsymbol{x}_{t\_j}^{(\tilde{s})} - \boldsymbol{x}_{t\_i}^{(s)})
+\end{equation}
+where $\tilde{s} = s +1$ if $j < i$ and $tilde(t)=s$ otherwise, i.e., it denotes tha latest available stage of the $j_{th}$ \textit{walker}. The stretch factor $z$ is randomly drawn from the \acrshort{PDF}
+\begin{equation}
+    \label{eq: AIES Z}
+    p(z|a)= \left\{\begin{matrix}
+  \frac{1}{\sqrt{z} (2\sqrt{a} - \frac{2}{\sqrt{a} } )}  & {\rm{if} }\ z \in [1 / a, a]  \\
+  0 & {\rm{otherwise} }
+\end{matrix}\right.
+\end{equation}
+which depends on the tuning parameter $a>1$. The candidate sample ${x}_{t}^{(\star)} \in \mathcal{D}_{\boldsymbol{X}} \subseteq \mathbb{R}^{M}$ is then accepted as the new location of the $i_{th}$ walker with probability:
+\begin{equation}
+    \label{eq: AIES acceptance probability}
+    \alpha = {\rm{min}}
+(1,
+z^{M-1} 
+\frac{\pi({x}_{t}^{(\star)}|\mathcal{Y})}
+{\pi({x}_{t\_{i}}^{(s)}|\mathcal{Y})} 
+)
+\end{equation}
+This is repeated for all $N_{chain}$ walkers in the ensemble. The resulting chains fulfil the \textit{detailed balanced condition}. A practical advantage of the \acrshort{AIES} algorithm is that it only has a single scalar tuning parameter $a$, which is often set to $a=2$ \citep{UQdoc}.
+\begin{algorithm}    
+    \caption{\acrlong{AIES} algorithm at $t_{th}$ step}
+    \label{Algorithm:AIES}
+    \KwData{$\pi(\boldsymbol{x}_{t}|\mathcal{Y})$: Target posterior; tuning parameter $a$}
+    \KwResult{MCMC samples at $t_{th}$ stage: $\mathcal{X}_{t} = \{ \mathcal{X}_{t\_1},\cdots,\mathcal{X}_{t\_N_{chain}}\}$), with $\mathcal{X}_{t\_i}=\{ \boldsymbol{x}_{t\_i}^{1},\cdots,\boldsymbol{x}_{t\_i}^{N_{\mathcal{X}}}\}$}
+    Initialization $N_{chain}$ samples $\{  \boldsymbol{x}_{t\_1}^{1},\cdots,\boldsymbol{x}_{t\_{N_{chain}}}^{1}\}$, with $\boldsymbol{x}_{t\_i}^{1} \in \mathcal{D}_{\boldsymbol{X}}$\
+    
+    \For{$s \gets 2 \ to  \ N_{\mathcal{X}}$}{
+        \For{$ i \in \{ 1,\cdots,N_{chain}\}$}{
+            Pick random $j$ from $\{ 1,\cdots,N_{chain}\} \backslash i$;\\
+            Propose ${x}_{t}^{(\star)}$ with \cref{eq: AIES walker};\\
+            Set $\boldsymbol{x}_{t\_i}^{s} = {x}_{t}^{(\star)}$ with probability $\alpha$ (see \cref{eq: AIES acceptance probability});
+        }        
+        } 
+\end{algorithm}
+
+
+
+\subsection{\acrlong{SMC}}
+
+Like \acrshort{MCMC}, \acrfull{SMC}, is another popular sampling method for a dynamic model. The parameters $\boldsymbol{{x}_{t}}$ which we are interested can be linked with the observations $\mathcal{Y}_{t}$ in a time series way:
+\begin{equation}
+\label{eq: Bayesian filtering}
+\begin{aligned}
+   & \boldsymbol{{x}_{t}}  =g(\boldsymbol{{x}_{t-1}}) + \boldsymbol{v} \ \   \ &\rm{(state  \ equation)}\\    
+     &\mathcal{Y}_{t}=m(\boldsymbol{{x}_{t}}) + \boldsymbol{w} \ \ \ \ \ &\rm{(observation \  equation)}
+\end{aligned}
+\end{equation}
+which stands for the prediction step and correction step, respectively.
+$g(\cdot)$ and $m(\cdot)$ denote \textit{transition equation} and \textit{emission equation}, respectively. They can be either linear or non-linear functions. $\boldsymbol{v}$ and $\boldsymbol{w}$ are independent random variables (or vectors) that represent process noise and observation noise, respectively.
+
+
+In this setting, we only focus on nonlinear non-Gaussian state-space model which is also called \textit{particle filter}. The feature of the non-linearity is used to relax the constraints at some simplified models (i.e., Kalman filter (KF) or Unscented Kalman filter (UKF), etc.). \acrshort{SMC} is a sequential Bayesian technique by generating a population of independent particles (each particle corresponding to a possible parameter set). It will filter these particles in a way that the final distribution of particles approximates the posterior distribution $\pi({x}_{t}|\mathcal{Y})$. This filtering typically consists of several steps: initial samples, reweighting and resampling, which are sequentially applied while new observations $\mathcal{Y}_{t}$ are added. There are different flavours of \textit{particle filter}. For book-length treatment, see \cite{murphy2012}. Due to space limitation, we will only present two standard \acrshort{SMC} algorithms that are used in the context of Bayesian inference, but other effective \textit{particle filter} methods can be also easily implemented.
+
+
+\subsubsection{\acrfull{SIS}}
+The basic idea is to approximate the belief state (of the entire stage trajectory) using a weighted set of particles:
+\begin{equation}
+    \label{eq: PF-SIS}
+\pi(\boldsymbol{x}_{1:t}|\mathcal{Y}_{1:t})
+\approx 
+\sum_{s=1}^{S} 
+\tilde{w}_{t}^{s}
+\delta_{\boldsymbol{x}_{1:t}^{s}}(\boldsymbol{x}_{1:t})
+\end{equation}
+\begin{equation}
+    \label{eq: PF-SIS-Normalized_weight}
+\tilde{w}_t^s=\frac{w_t^s}{\sum_{s=1}^{S}{(w_t^s)}}
+\end{equation}
+where $\tilde{w}_{t}^{s}$ is the normalised weight of sample $s = \{1,\cdots,N\}$ at time $t$ and  $\delta$ is \textit{Dirac delta function}. From this representation, we can easily compute the marginal distribution over the most recent state,$\pi(\boldsymbol{x}_{t}|\mathcal{Y}_{1:t})$, by simply ignoring the previous parts of the trajectory $\boldsymbol{x}_{1:t}$.
+
+We update this belief state using importance sampling. If the proposal has the form $q(\boldsymbol{x}_{1:t}|\mathcal{Y}_{1:t})$, we can rewrite the numerator recursively as follows:
+\begin{equation}
+    \label{eq: PF-recursive}
+    \pi(\boldsymbol{x}_{1:t}|\mathcal{Y}_{1:t})
+    \propto 
+    \pi(\mathcal{Y}_{t}|\boldsymbol{x}_{t})
+    \pi(\boldsymbol{x}_{t}|\boldsymbol{x}_{t-1})
+    \pi(\boldsymbol{x}_{t-1}|\mathcal{Y}_{t-1})
+\end{equation}
+where we have made the usual Markov assumptions. We will restrict attention to proposal densities of the following form:
+\begin{equation}
+    \label{eq: PF-recursive_2}
+\pi(\boldsymbol{x}_{1:t}|\mathcal{Y}_{1:t})
+=
+\pi(\boldsymbol{x}_{t}|\boldsymbol{x}_{1:t-1},\mathcal{Y}_{1:t})
+\pi(\boldsymbol{x}_{1:t-1}|\mathcal{Y}_{1:t-1})
+\end{equation}
+Then adding new state $\boldsymbol{x}_{t}$ to the end and assume we only need to keep the most recent part of the trajectory and observation sequence, rather than the whole history $1:t$ for simplicity. In this case, the weight becomes:
+\begin{equation}
+    \label{eq: PF-modified_weight}
+    w_{t}^{s}
+    \propto 
+    w_{t-1}^{s}
+    \frac{\pi(\mathcal{Y}_{t}|\boldsymbol{x}_{t}^{s})     \pi(\boldsymbol{x}_{t}^{s}|\boldsymbol{x}_{t-1}^{s})}
+    {q(\boldsymbol{x}_{t}^{s}|\boldsymbol{x}_{t-1}^{s},\mathcal{Y}_{t})} 
+\end{equation}
+Hence we can approximate the posterior $\pi(\boldsymbol{x}_{t}|\mathcal{Y}_{1:t})$ filtered density using \cref{eq: PF-SIS_simplified}
+\begin{equation}
+    \label{eq: PF-SIS_simplified}
+    \pi(\boldsymbol{x}_{t}|\mathcal{Y}_{1:t})
+    \approx 
+    \sum_{s=1}^{S} 
+    \tilde{w}_{t}^{s}
+    \delta_{\boldsymbol{x}_{t}^{s}}(\boldsymbol{x}_{t})
+\end{equation}
+As $S \rightarrow \infty$, one can show that this approaches the true posterior. All initial particles have the same values of weight and can be sampled uniformly using \textit{Latin hypercube sampling} in feasible ranges of parameter values. The whole \acrshort{SIS} without resampling process is shown in \cref{fig: PF-SIS} and \acrshort{SIS} algorithm is presented in \ref{Algorithm:SIS}.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width = 140mm]{Figures/figure-PF-SIS.pdf}
+    \caption{Particle filtering using sequential importnace sampling}
+    \label{fig: PF-SIS}
+\end{figure}
+\begin{algorithm}[htbp] 
+    \caption{\acrlong{SIS} algorithm at $t_{th}$ step}
+    \label{Algorithm:SIS}
+    \KwData{Samples $\boldsymbol{x}_{t-1}^{s}$ with weights $w_{t-1}^{s},\ s = \{1,\cdots,N\}$; observation $\mathcal{Y}_{t}$ at $t_{th}$ stage}
+    \KwResult{SMC samples with normalized weights $\tilde{w}_{t}^{s}$ at $t_{th}$ stage: $\boldsymbol{x}_{t}^{(\star)} = \mathcal{X}_{t} = \{\boldsymbol{x}_{t}^{1},\cdots,\boldsymbol{x}_{t}^{N} \}$)}
+    \For{$s \gets 1 \ to  \ N$}{
+            Sample from proposal distribution $\boldsymbol{x}_{t}^{s} \sim q(\boldsymbol{x}_{t}^{s}|\boldsymbol{x}_{t-1}^{s},\mathcal{Y}_{t})$;\\
+            Compute weight using \cref{eq: PF-modified_weight};
+        } 
+        Normalized weights;
+\end{algorithm}
+
+\subsubsection{\acrfull{SISR}}
+The basic \acrshort{SIS} algorithm fails after a few steps because most of the particles will have negligible weight. This is called the \textit{degeneracy problem}, and occurs especially when we are sampling in a high-dimensional space. We can quantify the degree of degeneracy using the \textit{effective sample size}, defined by:
+\begin{equation}
+    \label{eq: SISR_Seff}
+\hat{S}_{eff}=
+\frac{1}{\sum_{s=1}^{S} 
+(w_{t}^{s})^2
+} 
+\end{equation}
+If the variance of the weights is large, then we are wasting our resources updating particles with low weight, which do not contribute much to our posterior estimate. One effective way to the degeneracy problem is adding a resampling step. This improvement to the basic \acrshort{SIS} algorithm can monitor the \textit{effective sample size}, and whenever it drops below a threshold $S_{min}$, to eliminate particles with low weight, nad the nto create replicates of the surviving particles. This scheme is illustrated in \cref{fig: PF-SISR} and the overall \acrshort{SISR} algorithm is summarized in \ref{Algorithm:SISR}. In this case, $\boldsymbol{x}_{t}^{(\star)} \neq \mathcal{X}_{t}$ comes from fact that the resampling process abandons low weighted particles.
+
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width = 140mm]{Figures/figure-PF-SISR.pdf}
+    \caption{Principle of \acrshort{SISR} algorithm. Source: \protect\cite{speich2021}}
+    \label{fig: PF-SISR}
+\end{figure}
+
+\begin{algorithm}    
+    \caption{\acrlong{SISR} algorithm at $t_{th}$ step}
+    \label{Algorithm:SISR}
+    \KwData{Samples $\boldsymbol{x}_{t-1}^{s}$ with weights $w_{t-1}^{s},\ s = \{1,\cdots,N\}$; observation $\mathcal{Y}_{t}$ at $t_{th}$ stage}
+    \KwResult{SMC samples with normalized weights $\tilde{w}_{t}^{s}$ at $t_{th}$ stage: $\boldsymbol{x}_{t}^{(\star)} = \{\boldsymbol{x}_{t}^{1},\cdots,\boldsymbol{x}_{t}^{N} \}$)}
+    \For{$s \gets 1 \ to  \ N$}{
+            Sample from proposal distribution $\boldsymbol{x}_{t}^{s} \sim q(\boldsymbol{x}_{t}^{s}|\boldsymbol{x}_{t-1}^{s},\mathcal{Y}_{t})$;\\
+            Compute weight using \cref{eq: PF-modified_weight};
+        } 
+        Normalized weights;\\
+        Calculate degeneracy measure using \cref{eq: SISR_Seff};\\
+        \If{$\hat{S}_{eff} < S$}{
+        Resample $S$;\\        
+        }
+\end{algorithm}
+
 
 

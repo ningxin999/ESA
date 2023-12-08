@@ -3,7 +3,7 @@
 \geometry{includeheadfoot,left=1in,right=1in,top=1cm,bottom=1cm,asymmetric,bindingoffset=0pt,nomarginpar}
 \usepackage[table]{xcolor}
 \usepackage{amssymb}
-\usepackage{hyperref}
+\usepackage[final]{hyperref}
 \usepackage{apacite}
 \usepackage{enumitem}
 \usepackage{tikz}
@@ -38,6 +38,13 @@
 \usepackage{etoc}
 \usepackage{multicol}
 \usepackage{glossary-mcols}
+\usepackage{amssymb}
+\usepackage[ruled,longend,linesnumbered]{algorithm2e}
+\usepackage{cleveref}
+\usepackage{xr-hyper}
+\renewcommand*{\algorithmcfname}{}
+\renewcommand{\thealgocf}{Algorithm \ \arabic{algocf}}
+
 \raggedbottom
 %\renewcommand\nompreamble{\begin{multicols}{2}}
 %\renewcommand\nompostamble{\end{multicols}}
