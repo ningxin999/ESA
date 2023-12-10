@@ -1,18 +1,30 @@
 \chapter{Uncertainty quantification in parameter identification}
-
 \label{UQ}
-\section{Inverse problem}
-\subsection{Forward problem}
+Uncertainty quantification (UQ) aims at taking into account the uncertainties in the parameters of the model of a physical system and at studying their impact onto the system response. A well-established representation of an uncertainty quantification problem is presented next. The rationale is that any such problem can be represented by a combination of these elements, as sketched in \cref{fig: UQ_steps}:
+\begin{itemize}
+    \item Definition of the computational model $\mathcal{M}$ of the physical system. This is rather broad step that may refer to an analytical function in its simplest form, or an black box containing different levels of partial differential equations (e.g., finite element packages or finite difference packages). In general, the computational model $\mathcal{M}$ maps a set of input parameters $\boldsymbol{x})$ to one or more \acrfull{QoI}. often referred to as \textit{model responses}.
+    \item The sources of uncertainties in input space. This steps entails the identification of the input parameters that are uncertain and their description within a probabilistic context.
+    \item Uncertainty propagation from input parameters $\boldsymbol{x}$ to $\boldsymbol{y}$. This step refers to the quantification of the uncertainty in the \acrshort{QoI} by propagating the uncertainty of the input space through the computational model $\mathcal{M}$. 
+    \item Iterative updating of the source of uncertainty. This step may refer to several techniques used to updated the information available on the sources of uncertainty identified above. Examples includes \textit{sensitivity analysis} or \textit{Bayesian inference}. If we are using \textit{sensitivity analysis} to update the uncertainties, it can be explicitly called as \textit{forward problems}. If we are using \textit{Bayesian inference} to update the uncertainties, it can be called as \textit{inverse problems}.
+\end{itemize}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width = 140mm]{Figures/figure-UQ_steps.pdf}
+    \caption{Global framework for uncertainty quantification}
+    \label{fig: UQ_steps}
+\end{figure}
 
-Some Monte Carlo methods, including rejection sampling, importance sampling and particle filtering. The trouble with these methods is that they do not work well in high
-dimensional spaces. The most popular method for sampling from high-dimensional distributions
-is Markov chain Monte Carlo or MCMC.
-\subsection{High dimensional problem}
+\section{Problem statement in UQ}
+Modern engineering applications simulate UQ depending on a large number of input parameters. And the computational model is often treated as black box, i.e., only the input parameters $\boldsymbol{x}$ and model response $\boldsymbol{y}$ are available. Dealing with uncertainties using \textit{Monte Carlo} in such systems poses a major challenge to computational resources. In such cases, the underlying model can be substituted by a surrogate $\tilde{\mathcal{M}}$ as shown in \cref{fig: UQ_surrogate}. The solid line denotes the current working flow. Surrogate models enable many forward and inverse UQ analyses on high-fidelity computational models, by approximating the original model with a cheap-to-evaluate replacement model. In high dimensions, however, the performance of surrogate models decreases, while the cost of computing and storing them increases. This is well-known issue as the \textit{curse of dimensionality}. Therefore, there is never enough data for constructing a perfect surrogate in high dimensions. To alleviate this, we can perform \textit{experiment of design} sequentially using \textit{active learning} techniques or choose an appropriate type of surrogates. Next, we will introduce these in the next sections.
 
-Some Monte Carlo methods, including rejection sampling, importance sampling and particle filtering. The trouble with these methods is that they do not work well in high
-dimensional spaces. The most popular method for sampling from high-dimensional distributions
-is Markov chain Monte Carlo or MCMC.
-\section{Surrogate model-Spectral method}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width = 140mm]{Figures/figure-UQ_surrogate.pdf}
+    \caption{Using a surrogate to obtain the model response}
+    \label{fig: UQ_surrogate}
+\end{figure}
+
+\section{Surrogate model}
 
 Computer modelling is used in nearly every field of science and engineering. Often, these computer codes model complex phenomena, have many input parameters,
 and are expensive to evaluate. In order to explore the behavior of the model under uncertainty (e.g., uncertainty propagation, parameter calibration from data or sensitivity analysis), many
@@ -29,6 +41,50 @@ model instead of the original model. Therefore, surrogate modelling aims at cons
 \end{equation}
 where $\mathcal{R}$ is the residual between the original model and the surrogate.
 
+
+
+
+The general concept of \cref{eq:surrogate_model} is straightforward: given a finite set of input realisations and their corresponding model output, known as \textit{experiment of design}. A variety of methods is available in the surrogate modelling, in which some of them are listed in the \cref{table: All_Surrogates}.
+
+
+\begin{table}[htbp]
+\caption{Surrogate model choices}
+\label{table: All_Surrogates}
+\begin{tabular}{lll}
+\hline
+Name                              & \multicolumn{1}{c}{Shape} & \multicolumn{1}{c}{Parameters} \\ \hline
+Polynomial chaos expansions       &                           $\tilde{\mathcal{M}}(\boldsymbol{x})
+=
+\sum_{\boldsymbol{\alpha} \in \mathcal{A} } 
+c_{\alpha} \Psi_{\alpha} (\boldsymbol{x})$&                                $c_{\alpha}$\\
+Low-rank tensor approximations    &                           $\tilde{\mathcal{M}}(\boldsymbol{x})
+=
+\sum_{l=1}^{R} b_{l}
+\left ( 
+\prod_{i=1}^{M}  v_{l}^{i}x_{i}
+ \right ) 
+$&                                $b_{l}, \  z_{k,l}^{i}$\\
+Kriging (a.k.a Gaussian processs) &                           $\tilde{\mathcal{M}}(\boldsymbol{x})
+=
+\boldsymbol{\beta}^{T} \cdot \boldsymbol{f}(\boldsymbol{x})
+ + Z(\boldsymbol{x},\omega)$&                                $\boldsymbol{\beta}, \ \sigma_{Z}^{2}, \  \boldsymbol{\theta}$\\
+Support vector machines           &                           $\tilde{\mathcal{M}}(\boldsymbol{x})
+=
+\sum_{i=1}^{m}
+a_{i} K(\boldsymbol{x}_{i},\boldsymbol{x}) 
++b$&                                $\boldsymbol{a}, \ b$\\
+Neural networks                   &                           $\tilde{\mathcal{M}}(\boldsymbol{x})
+=
+f_{n}\left ( 
+\cdots f_{2}(
+b_{2} + f_{1}(
+b_{1} + \boldsymbol{w}_{1} \cdot \boldsymbol{x}
+)
+\cdot \boldsymbol{w}_{2}
+)
+\right ) $&                                $\boldsymbol{w}, \ \boldsymbol{b}$\\ \hline
+\end{tabular}
+\end{table}
 Why not neural networks?
 
 Model reduction lets us create approximate models that are fast to solve, and — importantly — it provides us a rigorous mathematical basis on which to establish strong guarantees of accuracy of the low-dimensional model. This is in contrast with black-box machine learning methods (ANN), where we just have to hope that our training data was rich enough to yield a sufficiently accurate surrogate model. This is especially problematic for engineering applications where we often need to issue extrapolatory predictions.
@@ -47,7 +103,7 @@ Different from Monte Carlo simulation (MCS) which is based on point-to-point exp
 \section{Dimensionality reduction}
 
 
-Geotechnical problems inherently involve high dimensionality, posing challenges for learning methods like surrogate modeling. Technical constraints impact the storage and processing of such huge amount of data. Furthermore, as input and output data expand, independent scalar surrogate models show inadequate in accurately capturing the covariance matrix of the original data, leading to less reliable predictions. Consequently, in high dimensional space, the need for dimensionality reduction technique (DR) becomes more critical. 
+Engineering problems inherently involve high dimensionality, posing challenges for learning methods like surrogate modeling. Technical constraints impact the storage and processing of such huge amount of data. Furthermore, as input and output data expand, independent scalar surrogate models show inadequate in accurately capturing the covariance matrix of the original data, leading to less reliable predictions. Consequently, in high dimensional space, the need for dimensionality reduction technique (DR) becomes more critical. 
 
 
 \subsection{Linear DR technique}
@@ -105,3 +161,20 @@ solution. In the context of machine learning, sequential sampling is also known 
 a smaller validation error compared to non-sequential strategies
 
 \section{Sensitivity analysis}
+
+
+
+\section{Uncertainty quantification in high dimensions}
+\subsection{Forward problem}
+
+Some Monte Carlo methods, including rejection sampling, importance sampling and particle filtering. The trouble with these methods is that they do not work well in high
+dimensional spaces. The most popular method for sampling from high-dimensional distributions
+is Markov chain Monte Carlo or MCMC.
+\subsection{High dimensional problem}
+
+Some Monte Carlo methods, including rejection sampling, importance sampling and particle filtering. The trouble with these methods is that they do not work well in high
+dimensional spaces. The most popular method for sampling from high-dimensional distributions
+is Markov chain Monte Carlo or MCMC.
+
+
+\subsection{Choice for sampling method in high dimensions}

@@ -172,7 +172,7 @@ envelope. If $u \geq \frac{\tilde{\pi}(\boldsymbol{x}_{t}^{s})}{Mq(\boldsymbol{x
 \begin{figure}[htbp]
     \centering
     \includegraphics[width = 140mm]{Figures/figure-rejectionsampling.pdf}
-    \caption{Schematic illustration of \textit{rejection sampling}. Source: \protect\cite{andrieu2003}}
+    \caption{Schematic illustration of \textit{rejection sampling} from \protect\cite{andrieu2003}}
     \label{fig: rejectsampling}
 \end{figure}
 But, large-dimensional spaces tend to be very empty, and the chances that this method accepts a point may be dramatically low when working with multidimensional spaces.
@@ -288,7 +288,7 @@ This is repeated for all $N_{chain}$ walkers in the ensemble. The resulting chai
 
 
 
-\subsection{\acrlong{SMC}}
+\subsection{Sequential Monte Carlo}
 
 Like \acrshort{MCMC}, \acrfull{SMC}, is another popular sampling method for a dynamic model. The parameters $\boldsymbol{{x}_{t}}$ which we are interested can be linked with the observations $\mathcal{Y}_{t}$ in a time series way:
 \begin{equation}
@@ -305,7 +305,7 @@ $g(\cdot)$ and $m(\cdot)$ denote \textit{transition equation} and \textit{emissi
 In this setting, we only focus on nonlinear non-Gaussian state-space model which is also called \textit{particle filter}. The feature of the non-linearity is used to relax the constraints at some simplified models (i.e., Kalman filter (KF) or Unscented Kalman filter (UKF), etc.). \acrshort{SMC} is a sequential Bayesian technique by generating a population of independent particles (each particle corresponding to a possible parameter set). It will filter these particles in a way that the final distribution of particles approximates the posterior distribution $\pi({x}_{t}|\mathcal{Y})$. This filtering typically consists of several steps: initial samples, reweighting and resampling, which are sequentially applied while new observations $\mathcal{Y}_{t}$ are added. There are different flavours of \textit{particle filter}. For book-length treatment, see \cite{murphy2012}. Due to space limitation, we will only present two standard \acrshort{SMC} algorithms that are used in the context of Bayesian inference, but other effective \textit{particle filter} methods can be also easily implemented.
 
 
-\subsubsection{\acrfull{SIS}}
+\subsubsection{Sequential importance sampling}
 The basic idea is to approximate the belief state (of the entire stage trajectory) using a weighted set of particles:
 \begin{equation}
     \label{eq: PF-SIS}
@@ -360,7 +360,7 @@ As $S \rightarrow \infty$, one can show that this approaches the true posterior.
 \begin{figure}[htbp]
     \centering
     \includegraphics[width = 140mm]{Figures/figure-PF-SIS.pdf}
-    \caption{Particle filtering using sequential importnace sampling}
+    \caption{Particle filtering using \acrshort{SIS} adapted from \protect\cite{nguyen2016}}
     \label{fig: PF-SIS}
 \end{figure}
 \begin{algorithm}[htbp] 
@@ -375,7 +375,7 @@ As $S \rightarrow \infty$, one can show that this approaches the true posterior.
         Normalized weights;
 \end{algorithm}
 
-\subsubsection{\acrfull{SISR}}
+\subsubsection{Sequential importance sampling and resampling}
 The basic \acrshort{SIS} algorithm fails after a few steps because most of the particles will have negligible weight. This is called the \textit{degeneracy problem}, and occurs especially when we are sampling in a high-dimensional space. We can quantify the degree of degeneracy using the \textit{effective sample size}, defined by:
 \begin{equation}
     \label{eq: SISR_Seff}
@@ -384,13 +384,13 @@ The basic \acrshort{SIS} algorithm fails after a few steps because most of the p
 (w_{t}^{s})^2
 } 
 \end{equation}
-If the variance of the weights is large, then we are wasting our resources updating particles with low weight, which do not contribute much to our posterior estimate. One effective way to the degeneracy problem is adding a resampling step. This improvement to the basic \acrshort{SIS} algorithm can monitor the \textit{effective sample size}, and whenever it drops below a threshold $S_{min}$, to eliminate particles with low weight, nad the nto create replicates of the surviving particles. This scheme is illustrated in \cref{fig: PF-SISR} and the overall \acrshort{SISR} algorithm is summarized in \ref{Algorithm:SISR}. In this case, $\boldsymbol{x}_{t}^{(\star)} \neq \mathcal{X}_{t}$ comes from fact that the resampling process abandons low weighted particles.
+If the variance of the weights is large, then we are wasting our resources updating particles with low weight, which do not contribute much to our posterior estimate. One effective way to the degeneracy problem is adding a resampling step. This improvement to the basic \acrshort{SIS} algorithm can monitor the \textit{effective sample size}, and whenever it drops below a threshold $S_{min}$, to eliminate particles with low weight, nad the nto create replicates of the surviving particles. This scheme is illustrated in \cref{fig: PF-SISR} and the overall \acrshort{SISR} algorithm is summarized in \ref{Algorithm:SISR}. In this case, $\boldsymbol{x}_{t}^{(\star)} \neq \mathcal{X}_{t}$ comes from fact that the resampling process discards low weighted particles.
 
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width = 140mm]{Figures/figure-PF-SISR.pdf}
-    \caption{Principle of \acrshort{SISR} algorithm. Source: \protect\cite{speich2021}}
+    \caption{Principle of \acrshort{SISR} algorithm adapted from \protect\cite{speich2021}}
     \label{fig: PF-SISR}
 \end{figure}
 
@@ -406,9 +406,33 @@ If the variance of the weights is large, then we are wasting our resources updat
         Normalized weights;\\
         Calculate degeneracy measure using \cref{eq: SISR_Seff};\\
         \If{$\hat{S}_{eff} < S$}{
-        Resample $S$;\\        
+        Resample;\\        
         }
 \end{algorithm}
 
+
+
+\section{Choices for sampling methods}
+
+In a continuous Bayesian calibration process, \acrshort{MCMC} and \acrshort{SMC} are two prevalent sampling methods. They are differed based on different sampling principles. \acrshort{MCMC}-derived uncertain variables are iteratively constructed based on \textit{random walk} and outperforms in high dimensions, while \acrshort{SMC}-derived uncertain variables are represented by updating weights on the particles and yields faster inference results. As shown in \cref{fig: PFvsMCMC_1,fig: PFvsMCMC_2}, both methods demonstrates their effectiveness in updating parameters in a two dimensional space example.
+
+\begin{figure}
+\centering
+\begin{subfigure}[htbp]{1.0\textwidth}
+   \includegraphics[width=140mm]{Figures/figure-PFvsMCMC-SIS.pdf}
+   \caption{Particle filter with \acrlong{SIS}}
+   \label{fig: PFvsMCMC_1} 
+\end{subfigure}
+
+\begin{subfigure}[htbp]{1.0\textwidth}
+   \includegraphics[width=140mm]{Figures/figure-PFvsMCMCAIES.pdf}
+   \caption{\acrlong{MCMC} using \acrlong{AIES}}
+   \label{fig: PFvsMCMC_2}
+\end{subfigure}
+
+\caption[Two sampling method]{\acrshort{SMC} and \acrshort{MCMC} in a two-dimensional example}
+\end{figure}
+
+SMC, with its non-iterative nature, offered the advantage of parallel processing, significantly enhancing computational efficiency. This attribute makes \acrshort{SMC} a favorable option when quick results are imperative. However, \textit{particle filter} doesnot work well in high dimensional spaces \citep{murphy2012}. Instead, \acrshort{MCMC}, with its random walk approach, showcased its proficiency in exploring high-dimensional parameter spaces, making it a suitable choice for complex and multifaceted problems. Therefore, the choice between these methods should be guided by the specific needs and priorities of the analysis, whether precision or computational efficiency takes precedence. Since most engineering are naturally in high dimensional space, this thesis adopts \acrshort{MCMC} during the sequential Bayesian calibration for the next sampling analysis.
 
 
