@@ -1,11 +1,12 @@
-\chapter{Uncertainty quantification in parameter identification}
+\chapter{Uncertainty quantification in high dimensions}
 \label{UQ}
-Uncertainty quantification (UQ) aims at taking into account the uncertainties in the parameters of the model of a physical system and at studying their impact onto the system response. A well-established representation of an uncertainty quantification problem is presented next. The rationale is that any such problem can be represented by a combination of these elements, as sketched in \cref{fig: UQ_steps}:
+
+Uncertainty quantification (UQ) endeavors to consider the uncertainties associated with the parameters in the model of a physical system and examine their influence on the system response. A well-established representation of an uncertainty quantification problem is outlined next. The premise is that any such problem can be depicted as a combination of these ingredients, as illustrated in \cref{fig: UQ_steps}:
 \begin{itemize}
-    \item Definition of the computational model $\mathcal{M}$ of the physical system. This is rather broad step that may refer to an analytical function in its simplest form, or an black box containing different levels of partial differential equations (e.g., finite element packages or finite difference packages). In general, the computational model $\mathcal{M}$ maps a set of input parameters $\boldsymbol{x})$ to one or more \acrfull{QoI}. often referred to as \textit{model responses}.
-    \item The sources of uncertainties in input space. This steps entails the identification of the input parameters that are uncertain and their description within a probabilistic context.
-    \item Uncertainty propagation from input parameters $\boldsymbol{x}$ to $\boldsymbol{y}$. This step refers to the quantification of the uncertainty in the \acrshort{QoI} by propagating the uncertainty of the input space through the computational model $\mathcal{M}$. 
-    \item Iterative updating of the source of uncertainty. This step may refer to several techniques used to updated the information available on the sources of uncertainty identified above. Examples includes \textit{sensitivity analysis} or \textit{Bayesian inference}. If we are using \textit{sensitivity analysis} to update the uncertainties, it can be explicitly called as \textit{forward problems}. If we are using \textit{Bayesian inference} to update the uncertainties, it can be called as \textit{inverse problems}.
+    \item A computational model $\mathcal{M}$. This encompasses a broad spectrum, ranging from an analytical function in its simplest form to a black box housing various levels of partial differential equations (e.g., finite element packages or finite difference packages). Generally, the computational model $\mathcal{M}$ establishes a mapping from a set of input parameters $\boldsymbol{x})$ to one or more \acrfull{QoI}, often denoted as \textit{model responses}.    
+    \item The sources of uncertainties in input space. This step involves identifying the input parameters that are uncertain and describing them within a probabilistic context.
+    \item Uncertainty propagation from input parameters $\boldsymbol{x}$ to $\boldsymbol{y}$. This step pertains to quantifying the \acrshort{QoI} by propagating the uncertainty of the input space through the computational model $\mathcal{M}$. 
+    \item Iterative updating of the source of uncertainty. This step encompasses various techniques employed to refine the information related to the identified sources of uncertainty above. Examples includes \textit{sensitivity analysis} or \textit{Bayesian inference}. If we are using \textit{sensitivity analysis} to update the uncertainties, it can be explicitly called as \textit{forward problems}. If we are using \textit{Bayesian inference} to update the uncertainties, it can be called as \textit{inverse problems}.
 \end{itemize}
 \begin{figure}[htbp]
     \centering
@@ -14,9 +15,14 @@ Uncertainty quantification (UQ) aims at taking into account the uncertainties in
     \label{fig: UQ_steps}
 \end{figure}
 
-\section{Problem statement in UQ}
-Modern engineering applications simulate UQ depending on a large number of input parameters. And the computational model is often treated as black box, i.e., only the input parameters $\boldsymbol{x}$ and model response $\boldsymbol{y}$ are available. Dealing with uncertainties using \textit{Monte Carlo} in such systems poses a major challenge to computational resources. In such cases, the underlying model can be substituted by a surrogate $\tilde{\mathcal{M}}$ as shown in \cref{fig: UQ_surrogate}. The solid line denotes the current working flow. Surrogate models enable many forward and inverse UQ analyses on high-fidelity computational models, by approximating the original model with a cheap-to-evaluate replacement model. In high dimensions, however, the performance of surrogate models decreases, while the cost of computing and storing them increases. This is well-known issue as the \textit{curse of dimensionality}. Therefore, there is never enough data for constructing a perfect surrogate in high dimensions. To alleviate this, we can perform \textit{experiment of design} sequentially using \textit{active learning} techniques or choose an appropriate type of surrogates. Next, we will introduce these in the next sections.
 
+\section{Problem statement}
+In modern engineering applications, uncertainty quantification (UQ) often involves simulations with a large number of input parameters. The computational model is frequently treated as a black box, where only the input parameters $\boldsymbol{x}$ and the corresponding model response $\boldsymbol{y}$ are available. Addressing uncertainties through traditional \textit{Monte Carlo} methods in such systems can be computationally intensive, posing a significant challenge. To alleviate this computational burden, surrogate models $\tilde{\mathcal{M}}$, illustrated in \cref{fig: UQ_surrogate}, can be employed. The solid line denotes the current working flow. These surrogate models approximate the original model with a cost-effective replacement model, allowing for efficient exploration of the input parameter space. A surrogate model $\tilde{\mathcal{M}}$ can be then expressed as:
+\begin{equation}
+\label{eq:surrogate_model}
+    \tilde{\mathcal{M}}(\boldsymbol{X})  \overset{\mathrm{def}}{=} \mathcal{M}(\boldsymbol{X}) - \mathcal{R}(\boldsymbol{X})
+\end{equation}
+where $\mathcal{R}$ is the residual between the original model and the surrogate. The overarching concept of \cref{eq:surrogate_model} is straightforward: working with a finite set of input parameters and their corresponding model outputs, commonly referred to as an \textit{experiment of design}.
 \begin{figure}[htbp]
     \centering
     \includegraphics[width = 140mm]{Figures/figure-UQ_surrogate.pdf}
@@ -24,28 +30,14 @@ Modern engineering applications simulate UQ depending on a large number of input
     \label{fig: UQ_surrogate}
 \end{figure}
 
-\section{Surrogate model}
-
-Computer modelling is used in nearly every field of science and engineering. Often, these computer codes model complex phenomena, have many input parameters,
-and are expensive to evaluate. In order to explore the behavior of the model under uncertainty (e.g., uncertainty propagation, parameter calibration from data or sensitivity analysis), many
-model runs are required. However, if the model is costly, only a few model evaluations can be afforded, which often do not suffice for thorough uncertainty quantification. In engineering and applied sciences, a popular work-around in this situation is to construct a reduced-order surrogate model. A reduced-order surrogate model is a cheap-to-evaluate proxy of the original model, which typically can be constructed from a relatively small number of model evaluations and approximates
-the input-output relation of the original model well. Since the surrogate model is cheap to evaluate, uncertainty quantification can be performed at a low cost by using the surrogate
-model instead of the original model. Therefore, surrogate modelling aims at constructing a metamodel that provides an accurate approximation to the original model while requiring as few model evaluations as possible for its construction. A surrogate model $\tilde{\mathcal{M}}$ can be expressed as:
-\begin{equation}
-\label{eq:surrogate_model}
-    \tilde{\mathcal{M}}(\boldsymbol{X})  \overset{\mathrm{def}}{=} \mathcal{M}(\boldsymbol{X}) - \mathcal{R}(\boldsymbol{X})
-\end{equation}
-\begin{equation}
-\label{eq:surrogate_model}
-    \tilde{\mathcal{M}}(\boldsymbol{X})  \overset{\mathrm{def}}{=} \mathcal{M}(\boldsymbol{X}) - \mathcal{R}(\boldsymbol{X})
-\end{equation}
-where $\mathcal{R}$ is the residual between the original model and the surrogate.
+ In high dimensions scenarios, surrogate models tend to exhibit diminished performance, coupled with escalating computational and storage costs-a challenge commonly acknowledged as the \textit{curse of dimensionality}. Consequently, challenges may arise from: 
+ 
+ (1) in large-scale scenarios, the computational intractability of conducting thousands of forward simulations is a common challenge; (2) the complexity of the input/output space dimensions adds another layer of difficulty;(3) the large dimensionality of the input/output space complicates the sampling process;
+ Thus, to alleviate this in a statistical inverse problems, methods can be broadly categorized in three groups: (1) choose an appropriate type of surrogates to accelerate a forward simulation; (2) reduce the size of the input/output space, i.e., sensitive analysis or \acrlong{DR} techniques; (3) sequential efficient sampling method in \textit{experiment of design} (\textit{active learning}) or in a posterior (e.g., \acrshort{MCMC}).
 
 
-
-
-The general concept of \cref{eq:surrogate_model} is straightforward: given a finite set of input realisations and their corresponding model output, known as \textit{experiment of design}. A variety of methods is available in the surrogate modelling, in which some of them are listed in the \cref{table: All_Surrogates}.
-
+\section{Surrogate model choices}
+ 
 
 \begin{table}[htbp]
 \caption{Surrogate model choices}
@@ -56,7 +48,7 @@ Name                              & \multicolumn{1}{c}{Shape} & \multicolumn{1}{
 Polynomial chaos expansions       &                           $\tilde{\mathcal{M}}(\boldsymbol{x})
 =
 \sum_{\boldsymbol{\alpha} \in \mathcal{A} } 
-c_{\alpha} \Psi_{\alpha} (\boldsymbol{x})$&                                $c_{\alpha}$\\
+\boldsymbol{y_{\alpha}} \Psi_{\boldsymbol{\alpha}} (\boldsymbol{x})$&                                $\boldsymbol{y_{\alpha}}$\\
 Low-rank tensor approximations    &                           $\tilde{\mathcal{M}}(\boldsymbol{x})
 =
 \sum_{l=1}^{R} b_{l}
@@ -85,96 +77,168 @@ b_{1} + \boldsymbol{w}_{1} \cdot \boldsymbol{x}
 \right ) $&                                $\boldsymbol{w}, \ \boldsymbol{b}$\\ \hline
 \end{tabular}
 \end{table}
-Why not neural networks?
+Ongoing research on surrogate modelling focuses on various problems, like hyperparametes tuning, mathematical explanation or the accuracy based on few observations. A range of techniques exist in surrogate modelling, in which some of them are listed in the \cref{table: All_Surrogates}. Among these popular surrogate models above, it is crucial to choose the most appropriate model for our own geotechnical problem. Inspired by \cite{torre2019}, we only focus on \acrfull{PCE} which is presented next. Compared with other surrogate models based on benchmark data sets (e.g., \textit{Ishigami function}, \textit{23-bar horizontal truss}), \acrshort{PCE} exhibits additional advantageous properties, such as:
+\begin{itemize}[left=0pt]
+    \item \acrshort{PCE} excels in various tasks, necessitating only minimal parameters tuning for adaptation to specified data considerations.
+    \item \acrshort{PCE} not only provides precise point-wise predictions for the output at given inputs, but also furnishes relevant statistics in the presence of input uncertainties. This benefits in UQ process as it results from the integration of the \acrshort{PCE} model with a suitable probabilistic characterisation of the input model.
+    \item The coefficients of \acrshort{PCE} makes it free to get sensitivity analysis results.
+    \item The output produced by \acrshort{PCE} is analytically expressed as a simple polynomial of the input. This characteristic makes the model easy to interpret from a mathematical standpoint. This is in contrast with black-box models (e.g., neural networks) or classification-based models (e.g., tree models), where our reliance is placed on the assumption that training data is sufficiently big to yield an accurate surrogate.
+    \item \acrshort{PCE} achieves acceptable performance levels with a relatively 
+    modest amount of data in the \textit{experiment of design}.
+\end{itemize}
+Note: The choice for \acrshort{PCE} in our thesis does not guarantee the conclusion that \acrshort{PCE} outperforms than other surrogate models. The properties obtained above are only based on some simple toy problems. Therefore, a choice for surrogate models is problem-specified and it is not always the same case when it encounters into different geotechnical problems. However, the \acrshort{PCE} advantages above \citep{torre2019} indeed give us confidence to get started with \acrshort{PCE} first. But other advanced surrogate models can be also easily employed.
 
-Model reduction lets us create approximate models that are fast to solve, and — importantly — it provides us a rigorous mathematical basis on which to establish strong guarantees of accuracy of the low-dimensional model. This is in contrast with black-box machine learning methods (ANN), where we just have to hope that our training data was rich enough to yield a sufficiently accurate surrogate model. This is especially problematic for engineering applications where we often need to issue extrapolatory predictions.
 
-\subsection{Polynomial chaos expansion}
-Metamodelling (or surrogate modelling) attempts to offset the increased costs of stochastic modelling by substituting the expensive-to-evaluate computational models (e.g. finite element models, FEM) with inexpensive-to-evaluate surrogates.
-Polynomial chaos expansions (PCE) are a powerful metamodelling technique that aims at providing a functional approxmation of a computational model through its spectral representation on a suitably built basis of polynomial functions.
+\section{Polynomial chaos expansion}
+Polynomial chaos expansions (PCE) represent a potent metamodelling technique designed to provide a functional approximation of a computational model. This approximation is achieved through its spectral representation of the model on a carefully built basis of polynomial functions. Consider a random vector with independent components $\boldsymbol{X} \in \mathbb{R}^{M}$ characterized by the joint \acrshort{PDF} $f_{\boldsymbol{X}}$. Additionally, suppose there exists a computation model with finite variance, defined as a mapping $Y = \mathcal{M}(\boldsymbol{X})$, with $Y \in \mathbb{R}$. This can be expressed as follows:
+\begin{equation}
+    \mathbb{E}[Y^2] 
+    =\int_{\mathcal{D}_{\boldsymbol{X}}}
+    \mathcal{M}^2(\boldsymbol{x})f_{\boldsymbol{X}}(\boldsymbol{x})
+    d\boldsymbol{x}< \infty 
+\end{equation}
+Then, a \acrshort{PCE} $\mathcal{M}(\boldsymbol{X})$ can be represented as:
+\begin{equation}
+\label{eq: PCE_basis}
+Y=\mathcal{M}(\boldsymbol{X}) \approx
+\sum\limits_{\alpha \in \mathcal{A} }{\boldsymbol{y_{\alpha}} \Psi_{\boldsymbol{\alpha}}(\boldsymbol{X})}
+\end{equation}
+where $\Psi_{\boldsymbol{\alpha}}(\boldsymbol{X})$ denotes multivariate polynomials orthonormal relative to $f_{\boldsymbol{X}}$, The multi-index $\boldsymbol{\alpha} \in \mathcal{A}$ identifies the truncated multivariate polynomials $\Psi_{\boldsymbol{\alpha}}$. $\boldsymbol{y_{\alpha}} \in \mathbb{R}$ corresponds to the corresponding coefficients. There are four main ingredients for a \acrshort{PCE}: (1) Construct the basis functions $\Psi_{\boldsymbol{\alpha}}$; (2) Compute the coefficients $\boldsymbol{y_{\alpha}}$; (3) Evaluate the precision of the \acrshort{PCE}; (4) Post process the \acrshort{PCE}. A visualized \acrshort{PCE} example with a two-dimensional input can be seen in \cref{fig: PCE_visual}.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width = 140mm]{Figures/figure-PCE_visualize.pdf}
+    \caption{PCE visualization in a two-dimensional example from \protect\cite{PCE-visual}}
+    \label{fig: PCE_visual}
+\end{figure}
 
-Different from other surrogate modelling approaches such as support vector machine, Gaussian process regression, or neural networks, the mathematical theory underlying reduced-order models can lead to more reliable and robust predictive capability \citep{frangos2010,kapteyn2021}.
 
-Different from Monte Carlo simulation (MCS) which is based on point-to-point exploring the output space, PCE assumes a generic structure, which better exploits the available runs of the FE realizations.
 
-\section{Data-driven inference}
-\subsection{Inference of the marginal distributions}
-\subsection{Inference of the copula}
+\subsection{Construct the basis functions $\Psi_{\alpha}$}
+The polynomial basis $\Psi_{\boldsymbol{\alpha}}(\boldsymbol{x})$ in \cref{eq: PCE_basis} is conventionally constructed using a set of \textit{univariate orthonormal polynomials} $\phi_{k}^{i}(x_{i})$, where these polynomials satisfy:
+\begin{equation}
+    \left \langle 
+\phi_{j}^{i},\phi_{k}^{i}
+ \right \rangle 
+= \delta_{jk}
+\end{equation}
+$\delta_{jk}$ is the \textit{Kronecker symbol}. The multivariate polynomials $\Psi_{\alpha}$ are then constructed by taking the tensor product of their univariate counterparts:
+\begin{equation}
+\Psi_{\boldsymbol{\alpha}}(\boldsymbol{x})
+ \overset{\mathrm{def}}{=}
+\prod_{i=1}^{M} 
+\phi_{\alpha_{i}}^{i}(x_{i})
+\end{equation}
+in which, $\boldsymbol{\alpha}= \{\alpha_{1},\cdots,\alpha_{M}\}  \ \alpha_{i} \in \mathbb{N}^{M}$ of degree $|\boldsymbol{\alpha }|=\sum_{i=1}^{M} \alpha_{i}$, and $\Psi_{\boldsymbol{\alpha}}(\boldsymbol{x})$ satisfies orthonormal properties as:
+$        \left \langle 
+\Psi_{\boldsymbol{\alpha}}(\boldsymbol{x}),\Psi_{\boldsymbol{\beta}}(\boldsymbol{x})
+ \right \rangle 
+= \delta_{\boldsymbol{\alpha}\boldsymbol{\beta}}$, where the symbol $\delta_{\boldsymbol{\alpha}\boldsymbol{\beta}}$ is an extension \textit{Kronecker symbol} to the multi-dimensional case. Classical families of orthogonal polynomials have been discovered historically in \cref{table: Polynomial_family}. 
+\begin{table}[]
+\caption{Univariate orthogonal polynomials}
+\label{table: Polynomial_family}
+\centering
+\begin{tabular}{lll}
+\hline
+\textbf{Name}& \textbf{Support $\mathcal{D}_{\boldsymbol{X}}$}& \textbf{Weight function $f_{\boldsymbol{X}}$}\\ \hline
+Legendre&            $[a;b]$&                    uniform\\
+Jacobi&            $[a;b]$&                    Beta\\
+Hermite&            ($-\infty;\infty$)&                    Gaussian\\
+Laguerre&            $[;\infty)$&                    Gamma\\ \hline
+\end{tabular}
+\end{table}
+\begin{equation}
+A^{M,p,q} = \{\alpha \in A^{M,p} : ||\alpha||_q \leq p\}; \ {\rm{where}}  \   
+||\alpha||_q = \left(\sum_{i=1}^{M} \alpha_i^q\right)^{1/q}
+\end{equation}
+The infinite series expansion cannot be handled in practical computations. Two truncation schemes can be applied: (1) restriction of maximum interaction $p$; (2) reduce hyperbolic truncation $q$. An example of the truncation in two dimensions for various values of $p$ and $q$ is depicted in \cref{fig: PCE_truncation}.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width = 140mm]{Figures/figure-PCE_truncation.pdf}
+    \caption{Truncation set for varying values of $p$ and $q$ from \cite{UQdoc}}
+    \label{fig: PCE_truncation}
+\end{figure}
+
+
+\subsection{Compute the coefficients $y_{\alpha}$}
+Various methods are available for computing the coefficients $\boldsymbol{y_{\alpha}}$ of the \acrshort{PCE} with a known basis. Two primary strategies commonly employed are \textit{projection} and \textit{regression}. \textit{Projection} methods leverage the orthogonality of the basis to determine the coefficients. On the other hand, \textit{regression} methods utilize standard linear regression approaches to solve the system. Below are some of the methods:
+
+\subsubsection{Projection method}
+The evaluation of the polynomial coefficients $\boldsymbol{y_{\alpha}}$ can be reformulated as the calculation of the expectation value in 
+\begin{equation}
+\label{eq: PCE_projection}
+\boldsymbol{y_{\alpha}} = E [\Psi_{\boldsymbol{\alpha}}(\boldsymbol{X}) \cdot \mathcal{M}(\boldsymbol{X})]
+\end{equation}
+
+\subsubsection{Least-squares minimization}
+This approach casts \cref{eq: PCE_projection} as a least-squares minimisation problem as shown:
+\begin{equation}
+\boldsymbol{\hat{y}_{\alpha}} = {\rm{argmin}} \mathbb{E} [\varepsilon_{P}^2(\boldsymbol{X})] = {\rm{argmin}} \mathbb{E} [(\tilde{\mathcal{M}}(\boldsymbol{X}) - \mathcal{M}(\boldsymbol{X}))^2]
+\end{equation}
+Some other regression methods can be also easily implemented, i.e., \textit{ordinary least square}, \textit{compressive sensing} or \textit{stochastic collocation}.
+
+
+\subsection{Check the accuracy of the \acrshort{PCE}}
+Error estimators are essential for quantifying the fidelity of a surrogate model in approximating the original model. To determine the precision of a surrogate, \textit{leve-one-out} (LOO) is a good way to assess the cross validation error. For a \acrshort{PCE} consisting $N$ metamodels, error $\varepsilon_{\text{LOO}}$ can be shown as:
+\begin{equation}
+\varepsilon_{\text{LOO}} = \frac{1}{N} \sum_{i=1}^{N} \left( \mathcal{M}(\boldsymbol{x}^{(i)}) - \tilde{\mathcal{M}}(\boldsymbol{x}^{(i)}) \right)^2
+\end{equation}
+
+
+
+
+\subsection{Post process the \acrshort{PCE}}
+Due to the inherent orthogonality with the polynomial basis functions, we can derive explicit expressions for moments characterizing the model output. The first pair moments of a \acrshort{PCE} find their manifestation within is coefficients. Specifically, the mean and variance of a \acrshort{PCE} manifest as:
+\begin{equation}
+E[Y] = \mathbb{E}[\tilde{\mathcal{M}}(\boldsymbol{X})] = y_{\boldsymbol{0}}
+\end{equation}
+\begin{equation}
+\text{Var}[Y] = E[Y^2] - E[Y]^2  \approx \sum_{\alpha \in A \setminus \{0\}} y_{\alpha}^2
+\end{equation}
+Another crucial aspect of \acrshort{PCE} post-processing lies in the fact the coefficients encapsulate significant details regarding the \textit{ANOVA} decomposition of a surrogate. This information can be harnessed to efficiently compute global sensitivity at a minimal computational expense. Because it is popular to make choices on the most important variables and update the uncertainties based on the sensitivity results. Thus, strictly speaking, \textit{sensitivity analysis} also belongs to the category of \acrshort{DR}. 
+
 \section{Dimensionality reduction}
 
 
-Engineering problems inherently involve high dimensionality, posing challenges for learning methods like surrogate modeling. Technical constraints impact the storage and processing of such huge amount of data. Furthermore, as input and output data expand, independent scalar surrogate models show inadequate in accurately capturing the covariance matrix of the original data, leading to less reliable predictions. Consequently, in high dimensional space, the need for dimensionality reduction technique (DR) becomes more critical. 
+Geotechnical problems inherently involve high dimensionality, posing challenges for learning methods like surrogate modeling. Technical constraints impact the storage and processing of such huge amount of data. Furthermore, as input and output data expand, independent scalar surrogate models show inadequate in accurately capturing the covariance matrix of the original data, leading to less reliable predictions. Consequently, in high dimensional space, the need for \acrfull{DR} becomes more critical. 
+
+The transformation from the \textit{original space} $\mathcal{D}_{\boldsymbol{Y}} \subseteq \mathbb{R}^{N}$ to a \textit{reduced space} $\mathcal{D}_{\boldsymbol{Z}} \subseteq \mathbb{R}^{n}$ with $n \ll N$ is the general form of a \acrshort{DR} mapping:
+\begin{equation}
+    \mathcal{T}_{DR} : \mathcal{D}_{\boldsymbol{Y}} \rightarrow \mathcal{D}_{\boldsymbol{Z}}
+\end{equation}
+where the underlying assumption is that $\mathcal{D}_{\boldsymbol{Z}}$ is embedded inside $\mathcal{D}_{\boldsymbol{Y}}$. There exists a large set of \acrshort{DR} techniques ranging from linear to nonlinear approaches. A simple but effective linear technique, that is widely used today, is the \textit{principal component analysis} (\acrshort{PCA}). It is popular across a wide range of disciplines and is closely related to the \textit{Karhunen-Loève expansion} and \textit{proper orthogonal decomposition}. In practical applications, the \acrshort{PCA} process is involves the estimation of the expectation $\boldsymbol{\mu_{Y}} \approx \mathbb{E}[\boldsymbol{Y}]$ and the covariance matrix $\Sigma_{\boldsymbol{Y}} \approx Cov[\boldsymbol{Y}]$. The $N$ eigenvectors of this covariance matrix are represented by $\phi_{p}$ for $p=1,\cdots,N$. The corresponding eigenvalue $\lambda_{p}$ signifies the variance of $\boldsymbol{Y}$ in direction of the $p-th$ principle component. Consequently, the random vector $\boldsymbol{Y}$ can be expressed through its $n$ principal components with the highest variance:
+\begin{equation}
+\boldsymbol{Y} \approx \boldsymbol{Y}^{PCA} 
+= \boldsymbol{\mu_{Y}} + 
+\sum_{p=1}^{n} z_{p}\phi_{p}
+\end{equation}
+The selection of the number $n$ is determined such that $\sum_{p=1}^{n} \lambda_{p} = 
+(1-\varepsilon_{0})\sum_{p=1}^{N} \lambda_{p}$, where $\varepsilon_{0}$ typically set to 0.01. Consequently, the model output $\boldsymbol{Y} \in \mathbb{R}^{N}$ can be processed by a linear transformation of the principle component vector $\boldsymbol{Z} = (z_{1},\cdots,z_{n})$. This reduction in the dimensionality, from $N$ to $n$ $n \ll N$, is then achieved. When data sets become more complex, more advanced \acrshort{DR} techniques can be used, such as \textit{multi-dimensional scaling}, \textit{kernel principal component analysis} and \textit{auto-encoder}.
 
 
-\subsection{Linear DR technique}
+\section{DR-based surrogate in Bayesian inference}
+In high dimensions, a popular two-step approach is frequently adopted to address such challenges: first, the input/output dimensions are reduced; subsequently, the surrogate model is directly constructed within the \textit{reduced space}. Performance of DR-based surrogate has showed superior performance in some benchmarks \citep{lataniotis2019}. Take \acrshort{PCA} and \acrshort{PCE} as a \acrshort{DR} example in \cref{fig: PCA-PCE}, the amalgamation of \acrshort{PCA}-\acrshort{PCE} constitutes an efficient surrogate modelling technique. The solid line denotes the current working flow. 
 
-\subsection{Nonlinear DR technique}
-
-\section{DR-based surrogate modelling}
-
-\section{Inverse problems in UQ}
-
-When faced with large-scale forward models characteristic of many engineering and science applications, high computational cost arises from: (1) In the large-scale setting, performing thousands or millions of forward simulations is often computationally intractable; (2)  the dimension of the input space are complex; (3) sampling may be complicated by the large dimensionality of the input space. Thus, to reduce the computational cost of solving of a statistical inverse problem, methods can be broadly in three groups: (1) Surrogate models to accelerate a forward simulation; (2) Reduce the dimension of the input space,i.e., sensitive analysis; (3) Efficient sampling method to posterior,i.e., MCMC.
-
-
-
-\subsection{Inverse problems}
-
-\subsection{Bayesian inference}
-
-\subsection{Bayesian calibration}
-
-\subsection{Sampling methods}
-
-\subsubsection{Using the CDF}
-
-
-
-\subsubsection{Rejection sampling}
-
-
-\subsubsection{Importance sampling}
-
-Often, in practical Bayesian models, it is not possible to obtain samples directly from p.x j y1WT / due to its complicated functional form.
-
-\subsubsection{Sequential Monte Carlo}
-
-
-\subsubsection{Markov chain Monte Carlo}
-
-
-
-\subsection{Choice of sampling method}
-
-
-\subsection{Seqential Bayesian inference}
-
-
-\section{Sequential enrichment for surrogate model}
-
-Traditional large-scale physics-based models are intractable to solve real-time, many-query context problem. 
-
-
-Instead of sampling the whole experimental design at once, it has been proposed to use sequential enrichment. Starting with
-a small experimental design, additional points are chosen based on the last computed sparse
-solution. In the context of machine learning, sequential sampling is also known as active learning.  In all cases, numerical examples show that the sequential strategy generally leads to solutions with
-a smaller validation error compared to non-sequential strategies
-
-\section{Sensitivity analysis}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width = 140mm]{Figures/figure-PCA_PCE.pdf}
+    \caption{\acrfull{DR} schematic example}
+    \label{fig: PCA-PCE}
+\end{figure}
+When it comes to Bayesian inference process accelerated by DR-based surrogate, working principles can be shown in \cref{fig: PCA-PCE-BI} as below:
+\begin{itemize}[left = 0pt]
+    \item Step one: \acrshort{PCA} technique reduces the size of input/output into principal components.
+    \item Step two: construct \acrshort{PCE} based on the principal components from step one.
+    \item Step three: Pass obtained \acrshort{PCE} into Bayesian inference process and evaluate the likelihood. 
+\end{itemize}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width = 140mm]{Figures/figure-PCA_PCE_BI.pdf}
+    \caption{Bayesian inference accelerated by a PCA-PCE surrogate}
+    \label{fig: PCA-PCE-BI}
+\end{figure}
+Note: DR-based surrogates are not only limited to Bayesian inference in high dimensions. Even in low dimension's inference, DR-based surrogates still outperform than the case with surrogate models without any \acrshort{DR}. Because \acrshort{DR} is more than a data compressing technique in Bayesian inference, it can capture the covariance matrix of the original data to make more accurate predictions. Due to this feature, compared to the traditional scalar models (e.g., PCE, kriging), DR-based surrogates make it possible to consider multiple outputs predictions.
 
 
 
-\section{Uncertainty quantification in high dimensions}
-\subsection{Forward problem}
-
-Some Monte Carlo methods, including rejection sampling, importance sampling and particle filtering. The trouble with these methods is that they do not work well in high
-dimensional spaces. The most popular method for sampling from high-dimensional distributions
-is Markov chain Monte Carlo or MCMC.
-\subsection{High dimensional problem}
-
-Some Monte Carlo methods, including rejection sampling, importance sampling and particle filtering. The trouble with these methods is that they do not work well in high
-dimensional spaces. The most popular method for sampling from high-dimensional distributions
-is Markov chain Monte Carlo or MCMC.
 
 
-\subsection{Choice for sampling method in high dimensions}
