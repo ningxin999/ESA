@@ -70,17 +70,17 @@ A schematic Bayesian inference in two dimensional space is displayed in \cref{fi
     \label{fig: BI_2D}
 \end{figure}
 \section{Posterior quantities of interest}
-Under the Bayesian paradigm, the posterior distribution $\pi(\boldsymbol{x}|\mathcal{Y})$ is the solution of the inverse problem. However, in practice it can also serve as an intermediate result that is further processed for interpretation or prediction purpose. Furthermore, the full distribution can contain too much information to allow statements about the inferred parameters. Therefore, it is common to process the posterior and extract certain quantities of interest that summarize the inversion results more concisely.
+Under the Bayesian paradigm, the posterior distribution $\pi(\boldsymbol{x}|\mathcal{Y})$ is the solution to the inverse problem. However, the full distribution can contain too much information to allow statements about the inferred parameters. Therefore, it is common to process the posterior and extract certain quantities of interest that summarize the inversion results more concisely.
 
 \subsubsection{Point estimate}
 
-In many applications, one is only interested in a single parameter, i.e., the one that characterise the inversion most suitably. The two most common \textit{point estimation} methods are the \textit{posterior mean} $\boldsymbol{x}^{\rm{mean}}$ and \acrfull{MAP}. The $\boldsymbol{x}^{\rm{mean}}$ is given as:
+In some applications, one may be only interested in a single parameter, i.e., the one that characterise the inversion most suitably. Two most common \textit{point estimation} methods are the \textit{posterior mean} $\boldsymbol{x}^{\rm{mean}}$ and \textit{maximum a posterior} (\acrshort{MAP}). The $\boldsymbol{x}^{\rm{mean}}$ is given as:
 \begin{equation}
     \label{eq: posterior mean}
     \boldsymbol{x}^{\rm{mean}} = \mathbb{E}[\boldsymbol{X}|\mathcal{Y}] = \int_{\mathcal{D}_{\boldsymbol{X}|\mathcal{Y}}} 
     \boldsymbol{x} \pi(\boldsymbol{x}|\mathcal{Y}) {\rm{d}} \boldsymbol{x}  
 \end{equation}
-It reflects what we expect the parameter value to be after the inference. The \acrshort{MAP} parameter, on the other hand, is the one maximises the posterior:
+It reflects what we expect the parameter mean value to be after the inference. The \acrshort{MAP} parameter, on the other hand, is the one maximises the posterior:
 \begin{equation}
     \label{eq: MAP}
     \begin{aligned}
@@ -120,16 +120,16 @@ As the full posterior distribution is an \textit{M}-dimensional object, which is
     \pi(x_{i}|\mathcal{Y}) = \int_{\mathcal{D}_{\boldsymbol{X}_{\rm{\boldsymbol{v}}}}}
           \pi(\boldsymbol{x}|\mathcal{Y}){\rm{d}} \boldsymbol{x_{\rm{\boldsymbol{v}}}}, {\rm{with}} \ \boldsymbol{\mathrm{v}} = \{1,\cdots,M\} \backslash i  
 \end{equation}
-This univariate \acrshort{PDF} can be integrated to obtain the corresponding \acrfull{CDF} which may then be used to define \acrfull{CI} on the calibrated parameters by means of quantiles. \textit{Copula dependence} can be inferred easily from the joint \acrshort{PDF} as $\boldsymbol{C}$. Different types of \acrshort{COV} can be seen in \cref{fig: COV}.
+This univariate \acrshort{PDF} can be integrated to obtain the corresponding \textit{cumulative density function} (\acrshort{CDF}) which may then be used to define \textit{confidence interval} (\acrshort{CI}) on the calibrated parameters by means of quantiles. \textit{Copula dependence} can be inferred easily from the joint \acrshort{PDF} as $\boldsymbol{C}$. Different types of \acrshort{COV} can be seen in \cref{fig: COV}.
 
 \subsubsection{Predictive distribution}
-Next, to evaluate the predictive prowess of the model, the Bayesian inference framework offers the possibility to compute \textit{predictive distributions}. Using previously defined discrepancy model from \cref{eq: Gaussian discrepancy} and \cref{eq: discrepancy term}, the \textit{prior predictive} distribution can be represented as:
+Next, to evaluate the predictive ability of the model, the Bayesian inference framework offers the possibility to compute \textit{predictive distributions}. Using previously defined discrepancy model from \cref{eq: Gaussian discrepancy} and \cref{eq: discrepancy term}, the \textit{prior predictive} distribution can be represented as:
 \begin{equation}
     \label{eq: prior predictive}
     \pi(\boldsymbol{y}) = \int_{\mathcal{D}_{\boldsymbol{X}}} 
     \pi(\boldsymbol{x}) \pi(\boldsymbol{y}|\boldsymbol{x}) {\rm{d}} \boldsymbol{x}
 \end{equation}
-It summarises the uncertainty about the model output considering also the discrepancy model before calibration. It should in practice be used to determine whether the measured data can be reproduced and consequently rule out severely ill-posed inverse problems that should be re-evaluated before proceeding with expensive calibration procedures. The \textit{posterior predictive} distribution (see \cref{eq: posterior predictive}) can be similarly written as:
+It summarises the uncertainty about the model output considering the discrepancy model before calibration. In practice, it is used to determine whether the measured data can be reproduced. It is essential for identifying and ruling out challenging inverse problems before proceeding with expensive calibration procedures. The \textit{posterior predictive} distribution (see \cref{eq: posterior predictive}) can be similarly written as:
 \begin{equation}
     \label{eq: posterior predictive}
     \pi(\boldsymbol{y}|\mathcal{Y}) = \int_{\mathcal{D}_{\boldsymbol{X}|\mathcal{Y}}} 
@@ -143,10 +143,10 @@ There are usually two categories of approximation methods: \textit{optimisation 
 \begin{itemize}[left=0pt]
     \item \textcolor{blue}{\textit{Optimisation based approximation}}: This method usually refers to variational inference. The basic principle is adopting some analytical distributions to approximate the posterior based on some loss functions. Then we can measure the similarity (e.g., \textit{Kullback-Leibler divergence}) between two distributions.
 
-The advantages of optimised approximation methods are: (1) Computationally efficient and work well on large models. (2) It has absolute converging criteria which makes easy to determine when to stop the modelling. (3) It scales better and are more amenable to parallelization. However, there are some problems itself: (1) In contrast to methods based on sampling, variational approaches are unlikely to discover the globally optimal solution (2) the precision of variational approaches is frequently constrained by the structure of the approximation.
-    \item \textcolor{blue}{\textit{Monte Carlo sampling}}: Sampling method is another way to approximate the posterior distribution. Examples include \textit{inverse probability transform}, \textit{rejection sampling}, \textit{importance sampling}, \acrfull{MCMC} and \acrfull{SMC}. These techniques produce random samples from a \textit{proposal distribution}, utilizing them to estimate both the posterior distribution and the associated statistics.
+The advantages of optimised approximation methods are: (1) computationally efficient and work well on large models; (2) has absolute converging criteria which makes easy to determine when to stop the modelling; (3) scales better and are more amenable to parallelization. However, there are some problems itself: (1) in contrast to methods based on sampling, variational approaches are unlikely to discover the globally optimal solution; (2) the precision of variational approaches is frequently constrained by the structure of the approximation.
+    \item \textcolor{blue}{\textit{Monte Carlo sampling}}: Sampling method is another way to approximate the posterior distribution. Examples include \textit{inverse probability transform}, \textit{rejection sampling}, \textit{importance sampling}, \textit{Markov chain Monte Carlo} (\acrshort{MCMC}) and \textit{sequential Monte Carlo} \acrshort{SMC}. These techniques produce random samples from a \textit{proposal distribution}, utilizing them to estimate both the posterior distribution and the associated statistics.
 
-  \textit{Monte Carlo sampling} has the advantages that: (1) It is more straightforward and flexible. (2) Given sufficient time and samples, it is assured to identify the globally optimal solution. However, for a good accuracy, \textit{Monte Carlo sampling} takes more time in the calculation and choosing an appropriate sampling technique. 
+  \textit{Monte Carlo sampling} has the advantages that: (1) it is more straightforward and flexible; (2) given sufficient time and samples, it is assured to identify the globally optimal solution. However, for a good accuracy, \textit{Monte Carlo sampling} takes more time in the calculation and require sophisticate deployments on choosing an appropriate sampling technique. 
 \end{itemize}
 
 In short mentioned above, \textit{Monte Carlo sampling} is asymptotically exact, accurately approximating the target distribution with increasing samples. In contrast, \textit{Optimisation based approximation} lacks guarantees but yields faster results. Both \textit{optimisation based approximation} and \textit{Monte Carlo sampling} are significant topics. Current studies on these are still very active with numerous techniques proposed in the past few years. More details can be found in \cite{murphy2012} and \cite{blei2017}.
@@ -154,7 +154,7 @@ In short mentioned above, \textit{Monte Carlo sampling} is asymptotically exact,
 It is worthy noted that it is not always the case \textit{Monte Carlo sampling} is better than \textit{optimisation based approximation} or vice versa. The choice for approximate a posterior is totally problem-specified. Faster posterior approximation requires trading off additional accuracy. In this thesis, however, we expect to find the global optimal values and hope the solution with guarantee. Therefore, our thesis is expected to focus only on \textit{Monte Carlo sampling} as detailed in the next section.
 
 \section{Monte Carlo sampling}
-In this section, we will explore algorithms belonging to the category centered around the concept of \textit{Monte Carlo approximation}. The idea is straightforward: generate $s$ samples from the $t_{th}$ step posterior, $\boldsymbol{x}_{t}^{s} \sim  \pi(\boldsymbol{x}_{t}|\mathcal{Y}_{t})$, in which $t$ represents the time in a dynamic model (state-space model) and $\mathcal{Y}_{t}$ denotes the observation at $t_{th}$ step. Because most engineering projects are carried out in stages as shown in \cref{fig: Sequential Bayesian}, a recursive updating and sampling scheme is required across the multiple stages in the dynamic model. The introduction of subscript $t$ aims to elucidate the sampling process at different stages. Following that, these samples are employed to compute any quantity of interest $\mathbb{E}[ f|\mathcal{Y}_{t}] \approx \frac{1}{S} \sum_{s=1}^{S}f(\boldsymbol{x}_{t}^{s})$ through an appropriate function $f$. By getting a sufficient number of samples, we can attain the desired level of accuracy.
+In this section, we will explore algorithms belonging to the category of \textit{Monte Carlo approximation}. The idea is straightforward: generate $s$ samples from the $t_{th}$ step posterior, $\boldsymbol{x}_{t}^{s} \sim  \pi(\boldsymbol{x}_{t}|\mathcal{Y}_{t})$, in which $t$ represents the time or stage in a dynamic model (state-space model) and $\mathcal{Y}_{t}$ denotes the observation at $t_{th}$ step. Because most engineering projects are carried out in stages as shown in \cref{fig: Sequential Bayesian}, a recursive updating and sampling scheme is required across the multiple stages in the dynamic model. The introduction of subscript $t$ aims to elucidate the sampling process at different stages. Following that, these samples are employed to compute any quantity of interest $\mathbb{E}[ f|\mathcal{Y}_{t}] \approx \frac{1}{S} \sum_{s=1}^{S}f(\boldsymbol{x}_{t}^{s})$ through an appropriate function $f$. By getting a sufficient number of samples, we can attain the desired level of accuracy.
 \begin{figure}[htbp]
     \centering
     \includegraphics[width = 140mm]{Figures/figures-Sequential_Bayesian.pdf}
@@ -162,15 +162,15 @@ In this section, we will explore algorithms belonging to the category centered a
     \label{fig: Sequential Bayesian}
 \end{figure}
 \subsection{Inverse probability transform}
-The most straightforward technique for sampling can be \textit{inverse probability transform} from a univariate distribution. As shown in \cref{fig: CDF}, if we can get the \acrfull{CDF}, then we can easily generate samples by computing $\boldsymbol{x}_{t}^{s}$ = CDF($\mathcal{U}$). $\mathcal{U}$ follows uniform distribution $\mathcal{U} \sim U(0,1)$ using a \textit{pseudo random number generator}.
-\begin{figure}[H]
+The most straightforward technique for sampling can be \textit{inverse probability transform} from a univariate distribution. As shown in \cref{fig: CDF}, if we can get the \textit{cumulative density function} (\acrshort{CDF}), then we can easily generate samples by computing $\boldsymbol{x}_{t}^{s}$ = CDF($\mathcal{U}$). $\mathcal{U}$ follows uniform distribution $\mathcal{U} \sim U(0,1)$ using a \textit{pseudo random number generator}.
+\begin{figure}[ht]
     \centering
     \includegraphics[width = 90mm]{Figures/figure-CDF.pdf}
     \caption{Sampling using an inverse CDF}
     \label{fig: CDF}
 \end{figure}
 \subsection{Rejection sampling}
-In cases where inverse \acrshort{CDF} method is not feasible, a straightforward alternative is to employ \textit{rejection sampling}. We propose a distribution $q(\boldsymbol{x})$ ensuring $Mq(\boldsymbol{x}) \geq \tilde{\pi}(\boldsymbol{x})$, where $M$ is a constant. Here, $\tilde{\pi}(\boldsymbol{x})$ represents unnormalized $\pi(\boldsymbol{x})$ (denoted as $\pi(\boldsymbol{x})$ = $\tilde{\pi}(\boldsymbol{x})/Z$ for some unknown constant $Z$). The function $Mq(\boldsymbol{x})$ serves an upper bound for $\tilde{\pi}$. At time stage $t$, we sample $\boldsymbol{x}_{t}^{s} \sim q(\boldsymbol{x}_{t})$, representing the random selection of a position $\boldsymbol{x}_{t}^{s}$. Subsequently, we sample $u \sim U(0,1)$, representing a random height ($y$ location) under the
+In cases where inverse \acrshort{CDF} method is not feasible, a straightforward alternative is to employ \textit{rejection sampling}. We propose a distribution $q(\boldsymbol{x})$ ensuring $Mq(\boldsymbol{x}) \geq \tilde{\pi}(\boldsymbol{x})$, where $M$ is a constant. Here, $\tilde{\pi}(\boldsymbol{x})$ represents unnormalized $\pi(\boldsymbol{x})$ (denoted as $\pi(\boldsymbol{x})$ = $\tilde{\pi}(\boldsymbol{x})/Z$ for some unknown constant $Z$). The function $Mq(\boldsymbol{x})$ serves an upper bound for $\tilde{\pi}$. At time stage $t$, we sample $\boldsymbol{x}_{t}^{s} \sim q(\boldsymbol{x}_{t})$, representing the random selection of a position $\boldsymbol{x}_{t}^{s}$. Subsequently, we sample $u \sim U(0,1)$, representing a random height under the
 upper bound. If $u \geq \frac{\tilde{\pi}(\boldsymbol{x}_{t}^{s})}{Mq(\boldsymbol{x}_{t}^{s})}$, the sample is rejected, otherwise it is accepted. The shaded region in \cref{fig: rejectsampling} shows the acceptance region, and the unshaded region indicates the rejection area.
 \begin{figure}[htbp]
     \centering
@@ -178,18 +178,17 @@ upper bound. If $u \geq \frac{\tilde{\pi}(\boldsymbol{x}_{t}^{s})}{Mq(\boldsymbo
 \caption{Schematic illustration of \textit{rejection sampling} from \protect\cite{andrieu2003}}
 \label{fig: rejectsampling}
 \end{figure}
-However, in high-dimensional spaces, the vast majority of the space tends to be sparsely populated. Consequently, the likelihood of this method accepting a point can be remarkably low when dealing with multidimensional spaces.
+However, in high-dimensional spaces, the majority of the space tends to be empty. Consequently, the likelihood of this method accepting a point can be remarkably low when dealing with multidimensional spaces.
 \subsection{Importance sampling}
-Now, we introduce a Monte Carlo technique called \textit{importance sampling}, designed for estimating integrals of the following form:
+Now, we introduce another Monte Carlo technique called \textit{importance sampling}, designed for estimating integrals of the following form:
 \begin{equation}
     \label{eq: MC_intergral}
     E[f(\boldsymbol{x}_{t})] = \int f(\boldsymbol{x}_{t})\pi(\boldsymbol{x}_{t}) d\boldsymbol{x}_{t}
     \approx \frac{1}{S}\sum_{s=1}^{S} f(\boldsymbol{x}_{t}^{s})
 \end{equation}
-where $\boldsymbol{x}_{t} \sim \pi(\boldsymbol{x}_{t})$
-The idea of \textit{Monte Carlo sampling} is to simply sample $\boldsymbol{x}_{t}$ from the distribution $\pi(\boldsymbol{x}_{t})$. However, when it comes to tricky target $\pi(\boldsymbol{x}_{t})$, the above estimation can be less efficient, meaning it requires huge amounts of samples to ensure the accuracy. In this case, it is more advantageous to sample from a proposed distribution $q(\boldsymbol{x}_{t}) \propto  f(\boldsymbol{x}_{t})\pi(\boldsymbol{x}_{t})$ than directly from $\pi(\boldsymbol{x}_{t})$.
+where $\boldsymbol{x}_{t} \sim \pi(\boldsymbol{x}_{t})$. As mentioned, the idea of \textit{Monte Carlo sampling} is to simply sample $\boldsymbol{x}_{t}$ from the distribution $\pi(\boldsymbol{x}_{t})$. However, when it comes to tricky targets $\pi(\boldsymbol{x}_{t})$, the above estimation can be less efficient, meaning it requires huge amounts of samples to ensure the accuracy. In this case, it is more advantageous to sample from a proposed distribution $q(\boldsymbol{x}_{t}) \propto  f(\boldsymbol{x}_{t})\pi(\boldsymbol{x}_{t})$ than directly from $\pi(\boldsymbol{x}_{t})$.
 
-The main concept behind the \textit{importance sampling} is to draw samples at the $t_{th}$ step from a proposed distribution $q(\boldsymbol{x}_{t})$ and adjust the the integral using importance weights to the target distribution. It then uses these samples to estimate the integral as follows:
+The main concept behind the \textit{importance sampling} is to draw samples at the $t_{th}$ step from a proposed distribution $q(\boldsymbol{x}_{t})$ and adjust the the integral using importance weights to the targets. It then uses these samples to estimate the integral as follows:
 \begin{equation}
     \label{eq: IS_integral}
     E[f(\boldsymbol{x}_{t})] = \int f(\boldsymbol{x}_{t})\pi(\boldsymbol{x}_{t}) d\boldsymbol{x}_{t} = \int f(\boldsymbol{x}_{t})\frac{\pi(\boldsymbol{x}_{t})}{q(\boldsymbol{x}_{t})}q(\boldsymbol{x}_{t}) d\boldsymbol{x}_{t}
@@ -206,7 +205,7 @@ where $\frac{\pi(\boldsymbol{x}_{t}^{s})}{q(\boldsymbol{x}_{t}^{s})}$ is the imp
 \subsection{Markov Chain Monte Carlo}
 Closed-form expressions for the posterior distribution in \cref{equation Bayes} cannot be derived in general. The exceptions are some linear models with conjugate distributions which were mentioned in \cref{section: Computational methods}. Compared with non-iterative methods above, \acrfull{MCMC} are a category of algorithms enabling the sampling from the posterior by constructing a Markov chain. This process asymptotically converges to the true \acrshort{PDF}.
 
-\acrshort{MCMC} methods were a breakthrough for solving Bayesian inverse problems and since then it has gained tremendous popularity in engineering areas. In a $\href{https://archive.siam.org/pdf/news/637.pdf}{\textit{SIAM News}}$ survey, \acrshort{MCMC} was listed as one of the 10 most important algorithms of the 20th century. Originally developed by statistical mechanics, it is used to construct \textit{Markov chains} to sample a selected \textit{target distribution}. Within the framework of Bayesian updating, this \textit{target distribution} is the posterior in our analysis. Based on the \textit{Markov chains}, every stage depends only on the last previously attained stage. We consider here one discrete \textit{Markov chain} of the type $\mathcal{X}_{t} =\{\boldsymbol{x}_{t}^{1},\cdots,\boldsymbol{x}_{t}^{N_{\mathcal{X}}}\}$, in which $N_{\mathcal{X}}$ is the number of chain iterations, $\mathcal{X}_{t}$ are the samples from sampling process and $t$ is stage number. They start from an arbitrary state $\boldsymbol{x}_{t}^{1} \in \mathcal{D}_{\bm{X}}$ that is updated sequentially based on a \textit{transition kernel}. This kernel is to ensure that \textit{Markov chains} fulfil \textit{detailed balance} condition and are reversible, i.e., that the dynamics of the chains is not affected by the direction of iterative sampling. We omit an in-depth discussion of those properties and refer interest readers to exhaustive resources on the matter in \cite{murphy2012}.
+\acrshort{MCMC} methods were a breakthrough for solving Bayesian inverse problems and since then it has gained tremendous popularity in engineering areas. In a $\href{https://archive.siam.org/pdf/news/637.pdf}{\textit{SIAM News}}$ survey, \acrshort{MCMC} was listed as one of the 10 most important algorithms of the 20th century. Originally developed by statistical mechanics, it is used to construct \textit{Markov chains} to sample a selected \textit{target distribution}. Within the framework of Bayesian updating, this \textit{target distribution} is the posterior in our analysis. Based on the \textit{Markov chains}, every stage depends only on the last previously attained stage. We consider here one discrete \textit{Markov chain} of the type $\mathcal{X}_{t} =\{\boldsymbol{x}_{t}^{1},\cdots,\boldsymbol{x}_{t}^{N_{\mathcal{X}}}\}$, in which $N_{\mathcal{X}}$ is the number of chain iterations, $\mathcal{X}_{t}$ are the samples from sampling process and $t$ is stage number. They start from an arbitrary state $\boldsymbol{x}_{t}^{1} \in \mathcal{D}_{\bm{X}}$ that is updated sequentially based on a \textit{transition kernel}. This kernel is to ensure that \textit{Markov chains} fulfil \textit{detailed balance} condition and are reversible, i.e., that the dynamics of the chains is not affected by the direction of iterative sampling. We omit an in-depth discussion of those properties and refer interested readers to exhaustive resources on the matter in \cite{murphy2012}.
 
 Nowadays, practitioners can choose from a vast of \acrshort{MCMC} algorithms, ranging from the classical \acrfull{MH}, to advanced \textit{Hamiltonian mechanics-inspired samplers}, \textit{transitional MCMC algorithm} and \textit{ensemble algorithms}. In the following, we will present two popular standard \acrshort{MCMC} algorithms that are used in the context of Bayesian inference, but other alternative \acrshort{MCMC} sampling methods can be also easily implemented.
 \subsubsection{\acrfull{MH}}
@@ -327,9 +326,9 @@ The concept is to estimate the belief state of the trajectory stage by utilizing
     \label{eq: PF-SIS-Normalized_weight}
 \tilde{w}_t^s=\frac{w_t^s}{\sum_{s=1}^{S}{(w_t^s)}}
 \end{equation}
-where $\tilde{w}_{t}^{s}$ represents the normalised weight of sample $s = \{1,\cdots,N\}$ at time $t$ and  $\delta$ denotes the \textit{Dirac delta function}. Utilizing this representation, we can straightforwardly calculate the marginal distribution over the most recent state,$\pi(\boldsymbol{x}_{t}|\mathcal{Y}_{1:t})$, by simply disregarding the preceding segments of the trajectory $\boldsymbol{x}_{1:t}$.
+where $\tilde{w}_{t}^{s}$ represents the normalised weight of sample $s = \{1,\cdots,N\}$ at time $t$ and  $\delta$ denotes the \textit{Dirac delta function}. Utilizing this representation, we can straightforwardly calculate the marginal distribution over the most recent state, $\pi(\boldsymbol{x}_{t}|\mathcal{Y}_{1:t})$, by simply disregarding the preceding segments of the trajectory $\boldsymbol{x}_{1:t}$.
 
-We revise this belief state through importance sampling. If the proposal takes the form $q(\boldsymbol{x}_{1:t}|\mathcal{Y}_{1:t})$, we can recursively express the numerator as follows:
+We update this belief state through importance sampling. If the proposal takes the form $q(\boldsymbol{x}_{1:t}|\mathcal{Y}_{1:t})$, we can recursively express the numerator as follows:
 \begin{equation}
     \label{eq: PF-recursive}
     \pi(\boldsymbol{x}_{1:t}|\mathcal{Y}_{1:t})
@@ -338,7 +337,7 @@ We revise this belief state through importance sampling. If the proposal takes t
     \pi(\boldsymbol{x}_{t}|\boldsymbol{x}_{t-1})
     \pi(\boldsymbol{x}_{t-1}|\mathcal{Y}_{t-1})
 \end{equation}
-where we have employed the customary Markov assumptions. Our focus will be on proposal densities in the following form:
+where we have assumed the customary Markov assumptions. Our focus will be on proposal densities in the following form:
 \begin{equation}
     \label{eq: PF-recursive_2}
 \pi(\boldsymbol{x}_{1:t}|\mathcal{Y}_{1:t})
@@ -424,7 +423,7 @@ If the variance of the weights is substantial, we are essentially allocating res
 
 In a continuous Bayesian calibration process, \acrshort{MCMC} and \acrshort{SMC} are two prevalent sampling methods. They are differed based on different sampling principles. \acrshort{MCMC}-derived uncertain variables are iteratively constructed based on \textit{random walk} and outperforms in high dimensions, while \acrshort{SMC}-derived uncertain variables are represented by updating weights on the particles and yields faster inference results. As shown in \cref{fig: PFvsMCMC_1,fig: PFvsMCMC_2}, both methods demonstrates their effectiveness in updating parameters in a two dimensional space example.
 
-\begin{figure}
+\begin{figure}[ht]
 \centering
 \begin{subfigure}[htbp]{1.0\textwidth}
    \includegraphics[width=140mm]{Figures/figure-PFvsMCMC-SIS.pdf}
